@@ -9,7 +9,7 @@ import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 class BluePrint {
   Future<void> printRecee(Map<String, dynamic> printSalesData,
       String payment_mode, String iscancelled, double bal) async {
-         print("value.printSalesData----${bal}");
+    print("value.printSalesData----${bal}");
     String? isConnected = await BluetoothThermalPrinter.connectionStatus;
     if (isConnected == "true") {
       List<int> bytes =
@@ -34,10 +34,10 @@ class BluePrint {
     bytes += generator.text(
         printSalesData["company"][0]["cnme"].toString().toUpperCase(),
         styles: PosStyles(
-          align: PosAlign.center,
-          height: PosTextSize.size2,
-          width: PosTextSize.size2,
-        ),
+            align: PosAlign.center,
+            height: PosTextSize.size2,
+            width: PosTextSize.size2,
+            codeTable: 'CP1252'),
         linesAfter: 1);
 
     if (printSalesData["company"][0]["ad1"] != null &&
@@ -134,7 +134,7 @@ class BluePrint {
             width: PosTextSize.size4,
           )),
     ]);
-       bytes += generator.row([
+    bytes += generator.row([
       PosColumn(
           text: 'SALESMAN',
           width: 6,
@@ -144,7 +144,7 @@ class BluePrint {
             width: PosTextSize.size4,
           )),
       PosColumn(
-          text:printSalesData["staff"][0]["sname"].toString().toUpperCase(),
+          text: printSalesData["staff"][0]["sname"].toString().toUpperCase(),
           width: 6,
           styles: PosStyles(
             align: PosAlign.right,

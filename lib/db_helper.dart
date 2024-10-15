@@ -2211,14 +2211,15 @@ class OrderAppDB {
       //         " from 'productDetailsTable' p left join 'salesBagTable' s on p.code  = s.code and s.customerid='$customerId' group by p.pid,p.code,p.item order by p.item";
       itemselectionquery =
           " SELECT p.pid prid,p.code prcode,p.item pritem ,p.hsn hsn ,p.rate1 prrate1,sum(s.qty) qty, " +
-              "(cast(st.pstock as real)-IFNULL(x.slQty,0) ) ActStock " +
+              "(cast(st.pstock as real)-IFNULL(x.slQty,0) ) ActStock ," +
+              "(case when sum(s.qty)>=0 then 1 else 0 end) sflag " +
               "from 'productDetailsTable' p " +
-              "inner join stockDetailsTable st on p.code=st.ppid and cast(st.pstock as real) > 0 " +
+              "left join stockDetailsTable st on p.code=st.ppid and cast(st.pstock as real) >= 0 " +
               "Left Join (Select sd.code slCode , sum(sd.qty) slQty from salesMasterTable sm " +
               "Inner Join salesDetailTable sd on sm.sales_id=sd.sales_id " +
               "where sm.sflag = 0 and sm.cancel=0 Group By sd.code) x on x.slCode= st.ppid " +
               "left join 'salesBagTable' s on p.code  = s.code and s.customerid='$customerId' " +
-              "group by p.pid,p.code,p.item order by p.item";
+              "group by p.pid,p.code,p.item order by (case when sum(s.qty)>=0 then 1 else 0 end) desc, p.item";
     }
 
     // unitquery = "select k.*,b.*, (k.prbaserate * k.pkg ) prrate1 from (" +
@@ -2234,6 +2235,7 @@ class OrderAppDB {
     result = await db.rawQuery(itemselectionquery);
 
     print("itemselection daat--${result}");
+    print("itemselection daat len--${result.length}");
     return result;
   }
 

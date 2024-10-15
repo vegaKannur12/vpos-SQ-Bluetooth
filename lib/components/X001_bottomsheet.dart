@@ -12,6 +12,7 @@ class CoconutSheet {
   List splitted = [];
   // String? stockout = "";
   ValueNotifier<bool> visible = ValueNotifier(false);
+
   showsalesMoadlBottomsheet(
       String item,
       String code,
@@ -31,6 +32,8 @@ class CoconutSheet {
       String time,
       String branch_id,
       double actstock) {
+    print(
+        "settti----${Provider.of<Controller>(context, listen: false).settingsList1}");
     return showModalBottomSheet(
         isScrollControlled: true,
         context: context,
@@ -174,7 +177,7 @@ class CoconutSheet {
                                             double q = double.parse(value
                                                 .salesqty_X001[index].text);
                                             q = q - 1;
-                                            if (q >= 0) {
+                                            // if (q >= 0) {
                                               value.salesqty_X001[index].text =
                                                   q.toString();
                                               Provider.of<Controller>(context,
@@ -203,9 +206,9 @@ class CoconutSheet {
                                                       index,
                                                       true,
                                                       "qty");
-                                            } else {
+                                            // } else {
                                               // value.qty[index].text = "0";
-                                            }
+                                            // }
                                             // Provider.of<Controller>(context,
                                             //         listen: false)
                                             //     .fromDb = false;
@@ -876,16 +879,16 @@ class CoconutSheet {
                                                 //     CustomSnackbar();
                                                 // snackbar.showSnackbar(context,
                                                 //     "No Sufficient Stock", "");
-                                                     Fluttertoast.showToast(
-                                                  msg:
-                                                      "No Sufficient Stock",
+                                                Fluttertoast.showToast(
+                                                  msg: "No Sufficient Stock",
                                                   toastLength:
                                                       Toast.LENGTH_SHORT,
                                                   gravity: ToastGravity.CENTER,
                                                   timeInSecForIosWeb: 1,
                                                   textColor: Colors.white,
                                                   fontSize: 14.0,
-                                                  backgroundColor: Colors.redAccent,
+                                                  backgroundColor:
+                                                      Colors.redAccent,
                                                 );
                                               } else {
                                                 int max = await OrderAppDB

@@ -5526,7 +5526,8 @@ class Controller extends ChangeNotifier {
     if (method == "0") {
       /////////////////////////////////method=="0" - excluisive , method=1 - inclusive
       taxable_rate = rate;
-    } else if (method == "1") {
+    } 
+    else if (method == "1") {
       double percnt = tax_per + cess_per;
       taxable_rate = rate * (1 - (percnt / (100 + percnt)));
       print("exclusive tax....$percnt...$taxable_rate");
@@ -5587,17 +5588,17 @@ class Controller extends ChangeNotifier {
 
     tax = (gross - disc_amt) * (tax_per / 100);
     print("tax....$tax....$gross... $disc_amt...$tax_per");
-    if (tax < 0) {
-      tax = 0.00;
-    }
+    // if (tax < 0) {
+    //   tax = 0.00;
+    // }
     cgst_amt = (gross - disc_amt) * (cgst_per / 100);
     sgst_amt = (gross - disc_amt) * (sgst_per / 100);
     igst_amt = (gross - disc_amt) * (igst_per / 100);
     cess = (gross - disc_amt) * (cess_per / 100);
     net_amt = ((gross - disc_amt) + tax + cess);
-    if (net_amt < 0) {
-      net_amt = 0.00;
-    }
+    // if (net_amt < 0) {
+    //   net_amt = 0.00;
+    // }
     notifyListeners();
     print("netamount.cal...$net_amt");
 
@@ -5672,7 +5673,9 @@ class Controller extends ChangeNotifier {
       String branch_id;
       if (br_id1 == null || br_id1 == " " || br_id1 == "null") {
         branch_id = " ";
-      } else {
+      } 
+      else 
+      {
         branch_id = br_id1;
       }
       print("Query=====${"FLT_GET_MAXSL '$os'"}");
@@ -5750,12 +5753,11 @@ class Controller extends ChangeNotifier {
 
     print("result salesMasterData----$printSalesData");
 
-    String cont = await setConnect("DC:0D:30:63:DB:A6");
-
-    ///MAC
+    String cont = await setConnect("DC:0D:30:63:DB:A6");   ///MAC
 
     print("conted? ====$cont");
-    if (cont == "true") {
+    if (cont == "true") 
+    {
       BluePrint bl = BluePrint();
       bl.printRecee(
           printSalesData, salesMasterData["payment_mode"], isCancelled, 0.0);
