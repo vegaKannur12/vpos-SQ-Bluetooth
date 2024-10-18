@@ -317,6 +317,7 @@ class Controller extends ChangeNotifier {
   bool? customer_visibility = false;
   String? product_code;
   double? balance;
+  bool connectedblu = false;
 
   Map<String, dynamic>? datafromFile;
 //////////////////////////////REGISTRATION ///////////////////////////
@@ -4590,7 +4591,6 @@ class Controller extends ChangeNotifier {
               print("delete result---$res2 , $res22");
               var res = await SqlConn.writeData(
                   "INSERT INTO [sale_master]([s_invoice_id],[s_id],[bill_no],[s_customer_id],[s_entry_date],[staff_id],[area_id],[s_cus_type],[s_gross_total],[s_dis_total],[s_ces_total],[s_tax_tot],[trans_mode],[c_option],[rounding],[net_amt],[sys_date],[cancel_flag],[cancel_time],[cancel_staff],[statusid],[TRANSFERONLINE],[br_id]) VALUES $ommastrString");
-
               var resdet = await SqlConn.writeData(
                   "INSERT INTO [sale_details]([s_invoice_id],[slno],[code],[hsn],[item],[qty],[packing],[rate],[unit],[unit_rate],[gross],[disc_per],[disc_amt],[cgst_per],[cgst_amt],[sgst_per],[sgst_amt],[igst_per],[igst_amt],[tax_per],[tax_amt],[ces_per],[ces_amt],[net_amt],[status],[UPDATED]) VALUES $omDetString");
               f = 1;
@@ -5520,14 +5520,12 @@ class Controller extends ChangeNotifier {
       bool onSub,
       String? disCalc) {
     flag = false;
-
     print(
         "attribute----$rate----$qty-$state_status---$disCalc --$disc_per--$disc_amount--$tax_per--$cess_per--$method");
     if (method == "0") {
       /////////////////////////////////method=="0" - excluisive , method=1 - inclusive
       taxable_rate = rate;
-    } 
-    else if (method == "1") {
+    } else if (method == "1") {
       double percnt = tax_per + cess_per;
       taxable_rate = rate * (1 - (percnt / (100 + percnt)));
       print("exclusive tax....$percnt...$taxable_rate");
@@ -5588,9 +5586,9 @@ class Controller extends ChangeNotifier {
 
     tax = (gross - disc_amt) * (tax_per / 100);
     print("tax....$tax....$gross... $disc_amt...$tax_per");
-    // if (tax < 0) {
-    //   tax = 0.00;
-    // }
+    if (tax < 0) {
+      tax = 0.00;
+    }
     cgst_amt = (gross - disc_amt) * (cgst_per / 100);
     sgst_amt = (gross - disc_amt) * (sgst_per / 100);
     igst_amt = (gross - disc_amt) * (igst_per / 100);
@@ -5601,11 +5599,46 @@ class Controller extends ChangeNotifier {
     // }
     notifyListeners();
     print("netamount.cal...$net_amt");
-
     print(
         "disc_per calcu mod=0..$tax..$gross... $disc_amt...$tax_per-----$net_amt");
     // notifyListeners();
     return "success";
+  }
+
+////////////////////on tap outside//////////////////////
+  Future handleTapOutside(String values, int index) async {
+    print("tapped out---$index");
+    double valuerate = 0.0;
+    notifyListeners();
+    print("values---$values");
+    if (values.isNotEmpty) {
+      print("not empty");
+      valuerate = double.parse(values);
+    } else {
+      valuerate = 0.00;
+    }
+
+    fromDb = false;
+    notifyListeners();
+    // var value = Provider.of<Controller>(context, listen: false);
+
+    if (salesqty_X001[index].text != null &&
+        salesqty_X001[index].text.isNotEmpty) {
+      await rawCalculation_X001(
+        double.parse(salesrate_X001[index].text),
+        double.parse(salesqty_X001[index].text),
+        double.parse(discount_prercent_X001[index].text),
+        double.parse(discount_amount_X001[index].text),
+        0.0, // Replace with actual 'tax_per' variable
+        0.0,
+        settingsList1[1]['set_value'].toString(),
+        0,
+        index,
+        true,
+        "",
+      );
+    }
+    notifyListeners();
   }
 
   ///////////////////////////////////////////////////////
@@ -5673,9 +5706,7 @@ class Controller extends ChangeNotifier {
       String branch_id;
       if (br_id1 == null || br_id1 == " " || br_id1 == "null") {
         branch_id = " ";
-      } 
-      else 
-      {
+      } else {
         branch_id = br_id1;
       }
       print("Query=====${"FLT_GET_MAXSL '$os'"}");
@@ -5753,11 +5784,12 @@ class Controller extends ChangeNotifier {
 
     print("result salesMasterData----$printSalesData");
 
-    String cont = await setConnect("DC:0D:30:63:DB:A6");   ///MAC
+    await setConnect("DC:0D:30:63:DB:A6");
 
-    print("conted? ====$cont");
-    if (cont == "true") 
-    {
+    ///MAC
+    print("conted? ====$connectedblu");
+    if (connectedblu) {
+      print("printer connected");
       BluePrint bl = BluePrint();
       bl.printRecee(
           printSalesData, salesMasterData["payment_mode"], isCancelled, 0.0);
@@ -5787,6 +5819,7 @@ class Controller extends ChangeNotifier {
         await EasyLoading.dismiss();
       }
     } else {
+      print("printer NOT connected");
       CustomSnackbar snackbar = CustomSnackbar();
       snackbar.showSnackbar(context, "Printer not Connected", "");
     }
@@ -5798,12 +5831,12 @@ class Controller extends ChangeNotifier {
     print("MAC = $mac"); // DC:0D:30:6E:A2:EE
     final String? result = await BluetoothThermalPrinter.connect(mac);
     print("state conneected $result");
-    return result;
-    // if (result == "true") {
-    //   setState(() {
-    //     connected = true;
-    //   });
-    // }
+    // return result;
+    if (result == "true") 
+    {
+      connectedblu = true;
+      notifyListeners();
+    }
   }
 
   ////////////////////////////////////////////////////////////

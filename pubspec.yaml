@@ -63,13 +63,14 @@ dependencies:
     path : C:/Users/PHP SERVER/Downloads/BluetoothThermalPrinter-master (1)/BluetoothThermalPrinter-master
   # esc_pos_utils: ^1.1.0
   flutter_esc_pos_utils: ^1.0.1
+  # esc_pos_utils: ^1.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
  
 
 dev_dependencies:
-  flutter_launcher_icons: "^0.13.1"
+  # flutter_launcher_icons: "^0.13.0"
   flutter_test:
     sdk: flutter
 flutter_icons:

@@ -91,7 +91,8 @@ class CoconutSheet {
                                         ),
                                       ),
                                       Text("-"),
-                                      Text(
+                                      Text
+                                      (
                                         code,
                                         style: TextStyle(
                                             fontSize: 17,
@@ -178,36 +179,36 @@ class CoconutSheet {
                                                 .salesqty_X001[index].text);
                                             q = q - 1;
                                             // if (q >= 0) {
-                                              value.salesqty_X001[index].text =
-                                                  q.toString();
-                                              Provider.of<Controller>(context,
-                                                      listen: false)
-                                                  .rawCalculation_X001(
-                                                      double.parse(value
-                                                          .salesrate_X001[index]
-                                                          .text),
-                                                      double.parse(value
-                                                          .salesqty_X001[index]
-                                                          .text),
-                                                      double.parse(value
-                                                          .discount_prercent_X001[
-                                                              index]
-                                                          .text),
-                                                      double.parse(value
-                                                          .discount_amount_X001[
-                                                              index]
-                                                          .text),
-                                                      tax_per,
-                                                      0.0,
-                                                      value.settingsList1[1]
-                                                              ['set_value']
-                                                          .toString(),
-                                                      0,
-                                                      index,
-                                                      true,
-                                                      "qty");
+                                            value.salesqty_X001[index].text =
+                                                q.toString();
+                                            Provider.of<Controller>(context,
+                                                    listen: false)
+                                                .rawCalculation_X001(
+                                                    double.parse(value
+                                                        .salesrate_X001[index]
+                                                        .text),
+                                                    double.parse(value
+                                                        .salesqty_X001[index]
+                                                        .text),
+                                                    double.parse(value
+                                                        .discount_prercent_X001[
+                                                            index]
+                                                        .text),
+                                                    double.parse(value
+                                                        .discount_amount_X001[
+                                                            index]
+                                                        .text),
+                                                    tax_per,
+                                                    0.0,
+                                                    value.settingsList1[1]
+                                                            ['set_value']
+                                                        .toString(),
+                                                    0,
+                                                    index,
+                                                    true,
+                                                    "qty");
                                             // } else {
-                                              // value.qty[index].text = "0";
+                                            // value.qty[index].text = "0";
                                             // }
                                             // Provider.of<Controller>(context,
                                             //         listen: false)
@@ -421,55 +422,68 @@ class CoconutSheet {
                                               ),
                                               keyboardType:
                                                   TextInputType.number,
-                                              onSubmitted: (values) {
-                                                double valuerate = 0.0;
-                                                print("values---$values");
-                                                if (values.isNotEmpty) {
-                                                  print("emtyyyy");
-                                                  valuerate =
-                                                      double.parse(values);
-                                                } else {
-                                                  valuerate = 0.00;
-                                                }
+                                              // onTapOutside: (event) {
+
+                                              // },
+                                              onTapOutside: (event) {
                                                 Provider.of<Controller>(context,
                                                         listen: false)
-                                                    .fromDb = false;
-                                                if (value.salesqty_X001[index]
-                                                            .text !=
-                                                        null &&
-                                                    value.salesqty_X001[index]
-                                                        .text.isNotEmpty) {
-                                                  Provider.of<Controller>(
-                                                          context,
-                                                          listen: false)
-                                                      .rawCalculation_X001(
-                                                          double.parse(value
-                                                              .salesrate_X001[
-                                                                  index]
-                                                              .text),
-                                                          double.parse(value
-                                                              .salesqty_X001[
-                                                                  index]
-                                                              .text),
-                                                          double.parse(value
-                                                              .discount_prercent_X001[
-                                                                  index]
-                                                              .text),
-                                                          double.parse(value
-                                                              .discount_amount_X001[
-                                                                  index]
-                                                              .text),
-                                                          tax_per,
-                                                          0.0,
-                                                          value.settingsList1[1]
-                                                                  ['set_value']
-                                                              .toString(),
-                                                          0,
-                                                          index,
-                                                          true,
-                                                          "");
-                                                }
+                                                    .handleTapOutside(
+                                                        value
+                                                            .salesqty_X001[
+                                                                index]
+                                                            .text,
+                                                        index);
                                               },
+                                              // onSubmitted: (values) {
+                                              //   double valuerate = 0.0;
+                                              //   print("values---$values");
+                                              //   if (values.isNotEmpty) {
+                                              //     print("emtyyyy");
+                                              //     valuerate =
+                                              //         double.parse(values);
+                                              //   } else {
+                                              //     valuerate = 0.00;
+                                              //   }
+                                              //   Provider.of<Controller>(context,
+                                              //           listen: false)
+                                              //       .fromDb = false;
+                                              //   if (value.salesqty_X001[index]
+                                              //               .text !=
+                                              //           null &&
+                                              //       value.salesqty_X001[index]
+                                              //           .text.isNotEmpty) {
+                                              //     Provider.of<Controller>(
+                                              //             context,
+                                              //             listen: false)
+                                              //         .rawCalculation_X001(
+                                              //             double.parse(value
+                                              //                 .salesrate_X001[
+                                              //                     index]
+                                              //                 .text),
+                                              //             double.parse(value
+                                              //                 .salesqty_X001[
+                                              //                     index]
+                                              //                 .text),
+                                              //             double.parse(value
+                                              //                 .discount_prercent_X001[
+                                              //                     index]
+                                              //                 .text),
+                                              //             double.parse(value
+                                              //                 .discount_amount_X001[
+                                              //                     index]
+                                              //                 .text),
+                                              //             tax_per,
+                                              //             0.0,
+                                              //             value.settingsList1[1]
+                                              //                     ['set_value']
+                                              //                 .toString(),
+                                              //             0,
+                                              //             index,
+                                              //             true,
+                                              //             "");
+                                              //   }
+                                              // },
                                               controller:
                                                   value.salesrate_X001[index],
                                               textAlign: TextAlign.right,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
+// import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 // import 'package:marsproducts/components/customSnackbar.dart';
@@ -11,15 +12,20 @@ class BluePrint {
       String payment_mode, String iscancelled, double bal) async {
     print("value.printSalesData----${bal}");
     String? isConnected = await BluetoothThermalPrinter.connectionStatus;
-    if (isConnected == "true") {
+    if (isConnected == "true") 
+    {
       List<int> bytes =
           await salesBill(printSalesData, payment_mode, iscancelled, bal);
+           final result = await BluetoothThermalPrinter.writeBytes(bytes);
       // final result = await BluetoothThermalPrinter.writeBytes(bytes);
-      var list = Uint8List.fromList(utf8.encode(bytes[0].toString()));
-      final result =
-          await BluetoothThermalPrinter.writeText(list[0].toString());
+      // var list = Uint8List.fromList(utf8.encode(bytes[0].toString()));
+      // final result =
+      //     await BluetoothThermalPrinter.writeText(list[0].toString());
       print("Print success $result");
-    } else {
+    } 
+    else 
+    
+    {
       print("not connecte----");
       //  CustomSnackbar snackbar = CustomSnackbar();
       //     snackbar.showSnackbar(context, "Printer not Connected", "");
@@ -28,9 +34,10 @@ class BluePrint {
 
   Future<List<int>> salesBill(Map<String, dynamic> printSalesData,
       String payment_mode, String iscancelled, double bal) async {
+        print("entered sales bill");
     List<int> bytes = [];
     CapabilityProfile profile = await CapabilityProfile.load();
-    final generator = Generator(PaperSize.mm58, profile);
+    final generator = Generator(PaperSize.mm80, profile);
     bytes += generator.text(
         printSalesData["company"][0]["cnme"].toString().toUpperCase(),
         styles: PosStyles(
