@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 // import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
+// import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 // import 'package:marsproducts/components/customSnackbar.dart';
 
 class BluePrint {
@@ -12,20 +13,17 @@ class BluePrint {
       String payment_mode, String iscancelled, double bal) async {
     print("value.printSalesData----${bal}");
     String? isConnected = await BluetoothThermalPrinter.connectionStatus;
-    if (isConnected == "true") 
-    {
+    if (isConnected == "true") {
       List<int> bytes =
           await salesBill(printSalesData, payment_mode, iscancelled, bal);
-           final result = await BluetoothThermalPrinter.writeBytes(bytes);
+      final result = await BluetoothThermalPrinter.writeBytes(bytes);
       // final result = await BluetoothThermalPrinter.writeBytes(bytes);
       // var list = Uint8List.fromList(utf8.encode(bytes[0].toString()));
       // final result =
       //     await BluetoothThermalPrinter.writeText(list[0].toString());
       print("Print success $result");
-    } 
-    else 
-    
-    {
+      await BluetoothThermalPrinter.disconnect();
+    } else {
       print("not connecte----");
       //  CustomSnackbar snackbar = CustomSnackbar();
       //     snackbar.showSnackbar(context, "Printer not Connected", "");
@@ -34,7 +32,7 @@ class BluePrint {
 
   Future<List<int>> salesBill(Map<String, dynamic> printSalesData,
       String payment_mode, String iscancelled, double bal) async {
-        print("entered sales bill");
+    print("entered sales bill");
     List<int> bytes = [];
     CapabilityProfile profile = await CapabilityProfile.load();
     final generator = Generator(PaperSize.mm80, profile);
@@ -129,16 +127,16 @@ class BluePrint {
           width: 6,
           styles: PosStyles(
             align: PosAlign.left,
-            height: PosTextSize.size4,
-            width: PosTextSize.size4,
+            height: PosTextSize.size2,
+            width: PosTextSize.size2,
           )),
       PosColumn(
           text: printSalesData["master"]["net_amt"].toStringAsFixed(2),
           width: 6,
           styles: PosStyles(
             align: PosAlign.right,
-            height: PosTextSize.size4,
-            width: PosTextSize.size4,
+            height: PosTextSize.size2,
+            width: PosTextSize.size2,
           )),
     ]);
     bytes += generator.row([
@@ -147,16 +145,16 @@ class BluePrint {
           width: 6,
           styles: PosStyles(
             align: PosAlign.left,
-            height: PosTextSize.size4,
-            width: PosTextSize.size4,
+            height: PosTextSize.size1,
+            width: PosTextSize.size1,
           )),
       PosColumn(
           text: printSalesData["staff"][0]["sname"].toString().toUpperCase(),
           width: 6,
           styles: PosStyles(
             align: PosAlign.right,
-            height: PosTextSize.size4,
-            width: PosTextSize.size4,
+            height: PosTextSize.size1,
+            width: PosTextSize.size1,
           )),
     ]);
     bytes += generator.hr(ch: '=', linesAfter: 1);

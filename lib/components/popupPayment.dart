@@ -52,12 +52,12 @@ class PaymentSelect {
                               areaId,
                               areaName,
                               cusid,
-                             date,
+                              date,
                               time,
                               "",
                               "",
-                              payment_mode!,branch_id
-                             
+                              payment_mode!,
+                              branch_id                            
                             ),
                           );
                           print(

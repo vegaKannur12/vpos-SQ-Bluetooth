@@ -5840,12 +5840,15 @@ class Controller extends ChangeNotifier {
   }
 
   ////////////////////////////////////////////////////////////
-  fromSalesbagTable_X001(String custmerId, String type) async {
+  fromSalesbagTable_X001(String custmerId, String type) async 
+  {  
     print("dgsdgg---$type");
     var res =
         await OrderAppDB.instance.selectfromsalebagTable_X001(custmerId, type);
     salesitemList2.clear();
-    for (var item in res) {
+
+    for (var item in res) 
+    {
       salesitemList2.add(item);
     }
     salesrate_X001 = List.generate(
