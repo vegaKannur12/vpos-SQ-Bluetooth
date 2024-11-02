@@ -240,7 +240,8 @@ class _DownloadedPageState extends State<DownloadedPage> {
                                               }
 
                                               if (downloadItems[index] ==
-                                                  "Account Heads") {
+                                                  "Account Heads") 
+                                              {
                                                 Provider.of<Controller>(context,
                                                         listen: false)
                                                     .getMasterData("customer",
@@ -269,7 +270,8 @@ class _DownloadedPageState extends State<DownloadedPage> {
                                                         "");
                                               }
                                               if (downloadItems[index] ==
-                                                  "Company") {
+                                                  "Company") 
+                                              {
                                                 // Provider.of<Controller>(context,
                                                 //         listen: false)
                                                 //     .getProductCompany(

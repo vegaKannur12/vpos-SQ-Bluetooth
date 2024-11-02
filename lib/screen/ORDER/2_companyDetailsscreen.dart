@@ -461,9 +461,9 @@ class _CompanyDetailsState extends State<CompanyDetails> {
                                       if (userType == "staff") {
                                         print("stffjknkdf");
 
-                                        await OrderAppDB.instance
-                                            .deleteFromTableCommonQuery(
-                                                "staffDetailsTable", "");
+                                        // await OrderAppDB.instance
+                                        //     .deleteFromTableCommonQuery(
+                                        //         "staffDetailsTable", "");
 
                                         // Provider.of<Controller>(context,
                                         //         listen: false)
@@ -473,22 +473,22 @@ class _CompanyDetailsState extends State<CompanyDetails> {
                                         //         listen: false)
                                         //     .getSettings(context, cid,
                                         //         "company details");
-                                        Provider.of<Controller>(context,
-                                                listen: false)
-                                            .getMasterData("staff", context, 0,
-                                                "company details");
-                                        Provider.of<Controller>(context,
-                                                listen: false)
-                                            .getMasterData("settings", context,
-                                                0, "company details");
-                                        Provider.of<Controller>(context,
-                                                listen: false)
-                                            .getMasterData(
-                                                "area", context, 0, "company details");
-                                        Provider.of<Controller>(context,
-                                                listen: false)
-                                            .getMasterData(
-                                                "stock", context, 0, "company details");
+                                        // Provider.of<Controller>(context,
+                                        //         listen: false)
+                                        //     .getMasterData("staff", context, 0,
+                                        //         "company details");
+                                        // Provider.of<Controller>(context,
+                                        //         listen: false)
+                                        //     .getMasterData("settings", context,
+                                        //         0, "company details");
+                                        // Provider.of<Controller>(context,
+                                        //         listen: false)
+                                        //     .getMasterData(
+                                        //         "area", context, 0, "company details");
+                                        // Provider.of<Controller>(context,
+                                        //         listen: false)
+                                        //     .getMasterData(
+                                        //         "stock", context, 0, "company details");
 
                                         Navigator.push(
                                           context,

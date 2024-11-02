@@ -121,7 +121,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     // } else {
     //   CircularProgressIndicator();
     // }
-
     formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
     s = formattedDate!.split(" ");
     // Provider.of<Controller>(context, listen: false)

@@ -8,8 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlorder24/screen/ORDER/0_dashnew.dart';
 
-
-
 class CommonPopup {
   int sales_id = 0;
   String? cid;
@@ -27,7 +25,9 @@ class CommonPopup {
     String ref,
     String reason,
     String payment_mode,
-    String branch_id
+    String branch_id,
+    double cashdisc_per,
+    double cashdisc_amt,
     // double baserate,
   ) {
     Timer? _timer;
@@ -106,16 +106,15 @@ class CommonPopup {
                         0) {
                       Provider.of<Controller>(context, listen: false)
                           .insertToOrderbagAndMaster(
-                        os!,
-                        date,
-                        time,
-                        custmerId,
-                        sid1!,
-                        areaid,
-                        double.parse(value.orderTotal1!),
-                        context,
-                        branch_id
-                      );
+                              os!,
+                              date,
+                              time,
+                              custmerId,
+                              sid1!,
+                              areaid,
+                              double.parse(value.orderTotal1!),
+                              context,
+                              branch_id);
                     }
 
                     // if (Provider.of<Controller>(context, listen: false)
@@ -167,6 +166,10 @@ class CommonPopup {
                   if (type == "sales") {
                     Provider.of<Controller>(context, listen: false)
                         .calculatesalesTotal(os!, custmerId);
+                    List<Map<String, dynamic>> outst =
+                        await OrderAppDB.instance.getOutstandingg(custmerId);
+                    print("outstandng list-------$outst");
+                    print("outstandng value-------${outst[0]["outstanding"]}");
 
                     if (Provider.of<Controller>(context, listen: false)
                             .salebagList
@@ -176,22 +179,26 @@ class CommonPopup {
                       sales_id =
                           await Provider.of<Controller>(context, listen: false)
                               .insertToSalesbagAndMaster(
-                                  sOs,
-                                  date,
-                                  time,
-                                  custmerId,
-                                  sid1!,
-                                  areaid,
-                                  value.salesTotal,
-                                  value.gross_tot,
-                                  value.tax_tot,
-                                  value.dis_tot,
-                                  value.cess_tot,
-                                  context,
-                                  payment_mode,
-                                  value.roundoff,
-                                  "",
-                                  "",branch_id);
+                        sOs,
+                        date,
+                        time,
+                        custmerId,
+                        sid1!,
+                        areaid,
+                        value.salesTotal,
+                        value.gross_tot,
+                        value.tax_tot,
+                        value.dis_tot,
+                        value.cess_tot,
+                        context,
+                        payment_mode,
+                        value.roundoff,
+                        "",
+                        "",
+                        branch_id,
+                        cashdisc_per,
+                        cashdisc_amt,
+                      );
                     }
 
                     Provider.of<Controller>(context, listen: false)
@@ -242,7 +249,7 @@ class CommonPopup {
                                                 context,
                                                 result[0],
                                                 areaname,
-                                                "not cancelled");
+                                                "not cancelled",outst[0]["outstanding"]);
                                         // Navigator.pop(context);
                                         // Sunmi printer = Sunmi();
                                         // printer.printReceipt(
@@ -285,7 +292,8 @@ class CommonPopup {
                                       },
                                       child: Text("Yes"),
                                       style: ElevatedButton.styleFrom(
-                                          backgroundColor: P_Settings.salewaveColor,
+                                          backgroundColor:
+                                              P_Settings.salewaveColor,
                                           textStyle: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold)),
@@ -343,7 +351,8 @@ class CommonPopup {
                                       },
                                       child: Text("No"),
                                       style: ElevatedButton.styleFrom(
-                                          backgroundColor: P_Settings.salewaveColor,
+                                          backgroundColor:
+                                              P_Settings.salewaveColor,
                                           textStyle: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold)),

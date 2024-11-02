@@ -14,7 +14,8 @@ class PaymentSelect {
     String reason,
     double baserate,
     String branch_id,
-   
+    double cashdisc_per,
+    double cashdisc_amt,
   ) {
     Size size = MediaQuery.of(context).size;
     String? payment_mode;
@@ -35,7 +36,10 @@ class PaymentSelect {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                        child: const Text('Cash',style: TextStyle(color: Colors.white),),
+                        child: const Text(
+                          'Cash',
+                          style: TextStyle(color: Colors.white),
+                        ),
                         style: ElevatedButton.styleFrom(
                             backgroundColor: P_Settings.salewaveColor,
                             textStyle: TextStyle(
@@ -57,7 +61,9 @@ class PaymentSelect {
                               "",
                               "",
                               payment_mode!,
-                              branch_id                            
+                              branch_id,
+                              cashdisc_per,
+                              cashdisc_amt,
                             ),
                           );
                           print(
@@ -67,7 +73,10 @@ class PaymentSelect {
                       width: size.width * 0.06,
                     ),
                     ElevatedButton(
-                        child: const Text('Credit',style: TextStyle(color: Colors.white),),
+                        child: const Text(
+                          'Credit',
+                          style: TextStyle(color: Colors.white),
+                        ),
                         style: ElevatedButton.styleFrom(
                             backgroundColor: P_Settings.salewaveColor,
                             textStyle: TextStyle(
@@ -84,12 +93,14 @@ class PaymentSelect {
                               areaId,
                               areaName,
                               cusid,
-                             date,
+                              date,
                               time,
                               "",
                               "",
-                              payment_mode!,branch_id
-                              
+                              payment_mode!,
+                              branch_id,
+                              cashdisc_per,
+                              cashdisc_amt,
                             ),
                           );
                           // print("payment mode...........$payment_mode");

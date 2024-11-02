@@ -121,7 +121,7 @@ class ShowModal {
                                     if (filter == "no filter") {
                                       Provider.of<Controller>(context,
                                               listen: false)
-                                          .getSaleProductList(customerId);
+                                          .getSaleProductList(customerId,context);
                                     } else if (filter == "with company") {
                                       Provider.of<Controller>(context,
                                               listen: false)

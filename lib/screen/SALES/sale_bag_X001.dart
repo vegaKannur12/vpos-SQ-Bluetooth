@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sqlorder24/components/customSnackbar.dart';
 import 'package:sqlorder24/screen/SALES/saleItemDetails.dart';
 import 'package:sqlorder24/screen/SALES/salesBottomsheet.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,8 @@ class _SaleCartX001State extends State<SaleCartX001> {
   PaymentSelect paysheet = PaymentSelect();
   SaleItemDetails saleDetails = SaleItemDetails();
   SalesBottomSheet sheet = SalesBottomSheet();
-
+  TextEditingController discPerCtrl = TextEditingController();
+  TextEditingController discRupeeCtrl = TextEditingController();
   List<String> s = [];
   List rawCalcResult = [];
   String? gen_condition;
@@ -44,6 +46,8 @@ class _SaleCartX001State extends State<SaleCartX001> {
   int counter = 0;
   bool isAdded = false;
   String? sname;
+  double discInRupee = 0.0;
+  // double totalAftrdiscount = 0.0;
 
   ////////////////////////////////////////////////////////
   @override
@@ -58,6 +62,8 @@ class _SaleCartX001State extends State<SaleCartX001> {
       widget.os,
       widget.custmerId,
     );
+    Provider.of<Controller>(context, listen: false).totalAftrdiscount =
+        Provider.of<Controller>(context, listen: false).salesTotal;
     // TODO: implement initState
     super.initState();
   }
@@ -65,13 +71,14 @@ class _SaleCartX001State extends State<SaleCartX001> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    List<dynamic> salebagReturnList = Provider.of<Controller>(context,
-            listen: false)
-        .salebagList
-        .where(
-            (salee) => double.parse(salee["qty"].toString().trimLeft()) < 0.0) // salee["qty"]< "0.0"
+    List<dynamic> salebagReturnList =
+        Provider.of<Controller>(context, listen: false)
+            .salebagList
+            .where((salee) =>
+                double.parse(salee["qty"].toString().trimLeft()) <
+                0.0) // salee["qty"]< "0.0"
+            .toList();
 
-        .toList();
     print("Return List===$salebagReturnList");
     return Scaffold(
       appBar: AppBar(
@@ -112,7 +119,6 @@ class _SaleCartX001State extends State<SaleCartX001> {
           } else {
             print("value.rateEdit----${value.rateEdit}");
             print("baglist length...........${value.salebagList.length}");
-
             return Provider.of<Controller>(context, listen: false)
                         .salebagList
                         .length ==
@@ -225,6 +231,185 @@ class _SaleCartX001State extends State<SaleCartX001> {
                           },
                         ),
                       ),
+                      Container(
+                        height: size.height * 0.07,
+                        color: Colors.yellow,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: size.width * 0.4,
+                              height: size.height * 0.07,
+                              color: P_Settings.roundedButtonColor,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(" Sales Total : ",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15)),
+                                  Flexible(
+                                    child: Text(
+                                        "\u{20B9}${value.salesTotal.toStringAsFixed(2)} ",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14)),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: size.width * 0.6,
+                              height: size.height * 0.07,
+                              color: Color.fromARGB(255, 212, 224, 233),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(" Disc : "),
+                                  Flexible(
+                                    child: TextFormField(
+                                      decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          focusedBorder: OutlineInputBorder(
+                                            // borderRadius:
+                                            //     BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                              color: const Color.fromARGB(
+                                                  255, 5, 5, 5),
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            // borderRadius:
+                                            //     BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                              color: const Color.fromARGB(
+                                                  255, 5, 5, 5),
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            // borderRadius:
+                                            //     BorderRadius.circular(12),
+                                            borderSide: const BorderSide(
+                                              color: Colors.black,
+                                              width: 3,
+                                            ),
+                                          ),
+                                          hintText: "%"),
+                                      controller: discPerCtrl,
+                                      // onFieldSubmitted: (value) {
+                                      //   convertToKG(
+                                      //       discPerCtrl.text.toString().trim(),
+                                      //       "per");
+                                      //   setState(() {});
+                                      // },
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: TextFormField(
+                                      decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          hoverColor: Colors.white,
+                                          focusedBorder: OutlineInputBorder(
+                                            // borderRadius:
+                                            //     BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                              color: const Color.fromARGB(
+                                                  255, 5, 5, 5),
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            // borderRadius:
+                                            //     BorderRadius.circular(12),
+                                            borderSide: BorderSide(
+                                              color: const Color.fromARGB(
+                                                  255, 5, 5, 5),
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            // borderRadius:
+                                            //     BorderRadius.circular(12),
+                                            borderSide: const BorderSide(
+                                              color: Colors.black,
+                                              width: 3,
+                                            ),
+                                          ),
+                                          hintText: "₹"),
+                                      controller: discRupeeCtrl,
+                                      // onFieldSubmitted: (value) {
+                                      //   convertToKG(
+                                      //       discRupeeCtrl.text
+                                      //           .toString()
+                                      //           .trim(),
+                                      //       "rupee");
+                                      //   setState(() {});
+                                      // },
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child: IconButton(
+                                          onPressed: () async {
+                                            if (discPerCtrl.text
+                                                    .toString()
+                                                    .trim()
+                                                    .isEmpty &&
+                                                discRupeeCtrl.text
+                                                    .toString()
+                                                    .trim()
+                                                    .isEmpty) {
+                                              await calcDiscount(0.0);                             
+                                              CustomSnackbar snackbar =
+                                                  CustomSnackbar();
+                                              snackbar.showSnackbar(
+                                                  context,
+                                                  "Must enter discount amount",
+                                                  "");
+                                            } 
+                                            else if (discPerCtrl.text
+                                                    .toString()
+                                                    .trim()
+                                                    .isNotEmpty &&
+                                                discRupeeCtrl.text
+                                                    .toString()
+                                                    .trim()
+                                                    .isNotEmpty) {
+                                              CustomSnackbar snackbar =
+                                                  CustomSnackbar();
+                                              snackbar.showSnackbar(
+                                                  context,
+                                                  "Dont enter % and amount together",
+                                                  "");
+                                            } 
+                                            else if (discPerCtrl
+                                                .text.isNotEmpty) {
+                                              convertToKG(
+                                                  discPerCtrl.text
+                                                      .toString()
+                                                      .trim(),
+                                                  "per");
+                                            } else if (discRupeeCtrl
+                                                .text.isNotEmpty) {
+                                              convertToKG(
+                                                  discRupeeCtrl.text
+                                                      .toString()
+                                                      .trim(),
+                                                  "rupee");
+                                            }
+                                          },
+                                          icon: Icon(
+                                            Icons.done,
+                                            color: Colors.green,
+                                          )))
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                       GestureDetector(
                         child: Container(
                           height: size.height * 0.07,
@@ -239,46 +424,77 @@ class _SaleCartX001State extends State<SaleCartX001> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(" Sales Total  : ",
+                                    Text(" Net Total  : ",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15)),
                                     Flexible(
-                                        child: Text(
-                                            "\u{20B9}${value.salesTotal.toStringAsFixed(2)}",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16)))
+                                      child: Text(
+                                        "\u{20B9}${Provider.of<Controller>(context, listen: false).totalAftrdiscount.toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),
                               GestureDetector(
                                 onTap: (() async {
                                   // value.areDetails.clear();
-                                  if (value.salebagList.length > 0) {
-                                    paysheet.showpaymentSheet(
+                                  if (discPerCtrl.text.isNotEmpty &&
+                                          discInRupee == 0.0 ||
+                                      discRupeeCtrl.text.isNotEmpty &&
+                                          discInRupee == 0.0) {
+                                    print("improper calc");
+                                    CustomSnackbar snak = CustomSnackbar();
+                                    snak.showSnackbar(
                                         context,
-                                        widget.areaId,
-                                        widget.areaname,
-                                        widget.custmerId,
-                                        s[0],
-                                        s[1],
-                                        " ",
-                                        " ",
-                                        value.orderTotal2[11],
-                                        widget.branch_id);
+                                        "Click tick mark to calculate Discount",
+                                        "");
+                                  } else {
+                                    if (discPerCtrl.text.isEmpty &&
+                                        discRupeeCtrl.text.isEmpty &&
+                                        value.salesTotal !=
+                                            value.totalAftrdiscount) {
+                                      value.totalAftrdiscount =
+                                          value.salesTotal;
+                                    }
+                                    if (value.salebagList.length > 0) {
+                                      print(
+                                          "baserate on save-----${value.orderTotal2[11].toString()}");
+                                      print(
+                                          "discPerCtrl.text----------------${discPerCtrl.text}");
+                                      print(
+                                          "disc in rupee----------------${discInRupee}");
+                                      print(
+                                          "totalaftrDisc----------------${value.totalAftrdiscount}");
+                                      paysheet.showpaymentSheet(
+                                          context,
+                                          widget.areaId,
+                                          widget.areaname,
+                                          widget.custmerId,
+                                          s[0],
+                                          s[1],
+                                          " ",
+                                          " ",
+                                          value.orderTotal2[11],
+                                          widget.branch_id,
+                                          double.tryParse(discPerCtrl.text) ??
+                                              0.0,
+                                          discInRupee);
+                                    }
+                                    Provider.of<Controller>(context,
+                                            listen: false)
+                                        .count = "0";
+                                    print("area name ${widget.areaname}");
                                   }
-
-                                  Provider.of<Controller>(context,
-                                          listen: false)
-                                      .count = "0";
-                                  print("area name ${widget.areaname}");
                                   // Provider.of<Controller>(context,listen: false).saveOrderDetails(id, value.cid!, series, orderid,  widget.custmerId, orderdate, staffid, widget.areaId, pcode, qty, rate, context)
                                 }),
                                 child: Container(
                                   width: size.width * 0.5,
                                   height: size.height * 0.07,
-                                  color: P_Settings.roundedButtonColor,
+                                  color: Colors.green,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -306,6 +522,38 @@ class _SaleCartX001State extends State<SaleCartX001> {
         }),
       )),
     );
+  }
+
+  calcDiscount(double discamt) {
+    double discval = double.parse(discamt.toString());
+    double totval = Provider.of<Controller>(context, listen: false).salesTotal;
+    if (discamt == 0.0) {
+      discInRupee = 0.0;
+      Provider.of<Controller>(context, listen: false).totalAftrdiscount =
+          totval;
+    } else {
+      Provider.of<Controller>(context, listen: false).totalAftrdiscount =
+          totval - discval;
+    }
+
+    setState(() {});
+  }
+
+  convertToKG(String val, String wgttype) {
+    double net =
+        Provider.of<Controller>(context, listen: false).salesTotal ?? 0;
+    double per = double.tryParse(val.toString()) ?? 0;
+    if (wgttype == "rupee") {
+      discInRupee = per;
+    } else {
+      discInRupee = net * (per / 100);
+    }
+    calcDiscount(discInRupee);
+    // deductionCalulate(moistInkg, type);
+    print("% = $per \nNet = $net\n discInRupee  =$discInRupee");
+    print("Disc in Rupee---${discInRupee.toString()}");
+    setState(() {});
+    // setState(() {});
   }
 
   Widget listItemFunction(
@@ -358,27 +606,34 @@ class _SaleCartX001State extends State<SaleCartX001> {
                       disc_amt.toStringAsFixed(2);
 
                   saleDetails.showsalesMoadlBottomsheet(
-                      itemName,
-                      code,
-                      hsn,
-                      qty,
-                      rate,
-                      disc_per,
-                      disc_amt,
-                      double.parse(tax),
-                      tax_amt,
-                      cess_per,
-                      cess_amt,
-                      net_amt,
-                      gross,
-                      context,
-                      size,
-                      index,
-                      widget.custmerId,
-                      widget.os,
-                      pkg,
-                      unit_name,
-                      widget.branch_id);
+                    itemName,
+                    code,
+                    hsn,
+                    qty,
+                    rate,
+                    disc_per,
+                    disc_amt,
+                    double.parse(tax),
+                    tax_amt,
+                    cess_per,
+                    cess_amt,
+                    net_amt,
+                    gross,
+                    context,
+                    size,
+                    index,
+                    widget.custmerId,
+                    widget.os,
+                    pkg,
+                    unit_name,
+                    widget.branch_id,
+                  );
+                  // setState(() {
+                  Provider.of<Controller>(context, listen: false)
+                          .totalAftrdiscount =
+                      Provider.of<Controller>(context, listen: false)
+                          .salesTotal;
+                  // });
                 },
                 // leading: CircleAvatar(backgroundColor: Colors.green),
                 title: Column(
@@ -655,7 +910,8 @@ class _SaleCartX001State extends State<SaleCartX001> {
                                                             context,
                                                             listen: false)
                                                         .getSaleProductList(
-                                                            widget.custmerId);
+                                                            widget.custmerId,
+                                                            context);
                                                     Provider.of<Controller>(
                                                             context,
                                                             listen: false)

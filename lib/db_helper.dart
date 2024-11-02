@@ -257,6 +257,8 @@ class OrderAppDB {
   static final cancel = 'cancel';
   static final cancel_staff = 'cancel_staff';
   static final cancel_dateTime = 'cancel_dateTime';
+  static final cashdisc_per = 'cashdisc_per';
+  static final cashdisc_amt = 'cashdisc_amt';
   static final sflag = 'sflag';
 
   Future<Database> get database async {
@@ -487,6 +489,8 @@ class OrderAppDB {
             $cancel INTEGER,
             $cancel_staff TEXT,
             $cancel_dateTime TEXT,
+            $cashdisc_per REAL,
+            $cashdisc_amt REAL,
             $brrid TEXT,
             $sflag INTEGER
           )
@@ -1060,56 +1064,59 @@ class OrderAppDB {
 
   //////////// Insert into sales master and sales details table/////////////
   Future insertsalesMasterandDetailsTable(
-      int sales_id,
-      double? qty,
-      double rate,
-      double unit_rate,
-      String? code,
-      String hsn,
-      String salesdate,
-      String salestime,
-      String os,
-      String customer_id,
-      String cus_type,
-      String bill_no,
-      String staff_id,
-      String areaid,
-      int total_qty,
-      String payment_mode,
-      String credit_option,
-      String unit,
-      int rowNum,
-      String table,
-      String item_name,
-      double gross_amount,
-      double dis_amt,
-      double dis_per,
-      double tax_amt,
-      double tax_per,
-      double cgst_per,
-      double cgst_amt,
-      double sgst_per,
-      double sgst_amt,
-      double igst_per,
-      double igst_amt,
-      double ces_amt,
-      double ces_per,
-      double gross_tot,
-      double dis_tot,
-      double tax_tot,
-      double ces_tot,
-      double net_amt,
-      double total_price,
-      double rounding,
-      int state_status,
-      int status,
-      double? unit_value,
-      double? base_rate,
-      double? packing,
-      int cancelStatus,
-      String cancel_staff,
-      String cancel_dateTime,
-      String branch_id) async {
+    int sales_id,
+    double? qty,
+    double rate,
+    double unit_rate,
+    String? code,
+    String hsn,
+    String salesdate,
+    String salestime,
+    String os,
+    String customer_id,
+    String cus_type,
+    String bill_no,
+    String staff_id,
+    String areaid,
+    int total_qty,
+    String payment_mode,
+    String credit_option,
+    String unit,
+    int rowNum,
+    String table,
+    String item_name,
+    double gross_amount,
+    double dis_amt,
+    double dis_per,
+    double tax_amt,
+    double tax_per,
+    double cgst_per,
+    double cgst_amt,
+    double sgst_per,
+    double sgst_amt,
+    double igst_per,
+    double igst_amt,
+    double ces_amt,
+    double ces_per,
+    double gross_tot,
+    double dis_tot,
+    double tax_tot,
+    double ces_tot,
+    double net_amt,
+    double total_price,
+    double rounding,
+    int state_status,
+    int status,
+    double? unit_value,
+    double? base_rate,
+    double? packing,
+    int cancelStatus,
+    String cancel_staff,
+    String cancel_dateTime,
+    String branch_id,
+    double cashdisc_per,
+    double cashdisc_amt,
+  ) async {
     final db = await database;
     var res2;
     var res3;
@@ -1121,7 +1128,7 @@ class OrderAppDB {
       res2 = await db.rawInsert(query2);
     } else if (table == "salesMasterTable") {
       var query3 =
-          'INSERT INTO salesMasterTable(sales_id, salesdate, salestime, os, cus_type, bill_no, customer_id, staff_id, areaid, total_qty, payment_mode, credit_option, gross_tot, dis_tot, tax_tot, ces_tot, rounding, net_amt,  state_status, status , cancel ,cancel_staff,cancel_dateTime,brrid,sflag) VALUES("${sales_id}", "${salesdate}", "${salestime}", "${os}", "${cus_type}", "${bill_no}", "${customer_id}", "${staff_id}", "${areaid}", $total_qty, "${payment_mode}", "${credit_option}", $gross_tot, $dis_tot, $tax_tot, $ces_tot,${rounding}, ${total_price.toStringAsFixed(2)}, $state_status, ${status},${cancelStatus},"${cancel_staff}","${cancel_dateTime}","$branch_id",0)';
+          'INSERT INTO salesMasterTable(sales_id, salesdate, salestime, os, cus_type, bill_no, customer_id, staff_id, areaid, total_qty, payment_mode, credit_option, gross_tot, dis_tot, tax_tot, ces_tot, rounding, net_amt,  state_status, status , cancel ,cancel_staff,cancel_dateTime,cashdisc_per,cashdisc_amt ,brrid,sflag) VALUES("${sales_id}", "${salesdate}", "${salestime}", "${os}", "${cus_type}", "${bill_no}", "${customer_id}", "${staff_id}", "${areaid}", $total_qty, "${payment_mode}", "${credit_option}", $gross_tot, $dis_tot, $tax_tot, $ces_tot,${rounding}, ${total_price.toStringAsFixed(2)}, $state_status, ${status},${cancelStatus},"${cancel_staff}","${cancel_dateTime}",$cashdisc_per,$cashdisc_amt,"$branch_id",0)';
       res2 = await db.rawInsert(query3);
       print("insertsalesmaster$query3");
     }
@@ -1268,6 +1275,19 @@ class OrderAppDB {
     print(
         'SELECT  * FROM salesBagTable WHERE customerid="${customerId}" AND os = "${os}"');
     print("result sale cart...$res");
+    return res;
+  }
+
+////////////////////////////////////////////////////
+  Future<List<Map<String, dynamic>>> getOutstandingg(String customerId) async {
+    print("Outstanding customerId---${customerId}");
+    // .of<Controller>(context, listen: false).customerList.clear();
+    Database db = await instance.database;
+    // var res = await db.rawQuery(
+    //   "select AC.hname,AC.ba as opng_bal,SUM(SM.net_amt) as net_amt from accountHeadsTable AC LEFT JOIN salesMasterTable SM ON SM.customer_id=AC.ac_code where AC.ac_code='C@101'");
+    var res = await db.rawQuery(
+        "select AC.hname,AC.ba as opng_bal,SUM(AC.ba+IFNULL(SM.net_amt,0)) as outstanding from accountHeadsTable AC LEFT JOIN salesMasterTable SM ON SM.customer_id=AC.ac_code AND SM.payment_mode=-3 AND SM.status=0 where AC.ac_code='${customerId}'"); //'C@101'
+    print("Outstanding ...$res");
     return res;
   }
 
@@ -2209,17 +2229,16 @@ class OrderAppDB {
       // itemselectionquery =
       //     "SELECT p.pid prid,p.code prcode,p.item pritem ,p.hsn hsn ,p.rate1 prrate1,sum(s.qty) qty" +
       //         " from 'productDetailsTable' p left join 'salesBagTable' s on p.code  = s.code and s.customerid='$customerId' group by p.pid,p.code,p.item order by p.item";
-      itemselectionquery =
-          " SELECT p.pid prid,p.code prcode,p.item pritem ,p.hsn hsn ,p.rate1 prrate1,sum(s.qty) qty, " +
-              "(cast(st.pstock as real)-IFNULL(x.slQty,0) ) ActStock ," +
-              "(case when sum(s.qty)>=0 then 1 else 0 end) sflag " +
-              "from 'productDetailsTable' p " +
-              "left join stockDetailsTable st on p.code=st.ppid and cast(st.pstock as real) >= 0 " +
-              "Left Join (Select sd.code slCode , sum(sd.qty) slQty from salesMasterTable sm " +
-              "Inner Join salesDetailTable sd on sm.sales_id=sd.sales_id " +
-              "where sm.sflag = 0 and sm.cancel=0 Group By sd.code) x on x.slCode= st.ppid " +
-              "left join 'salesBagTable' s on p.code  = s.code and s.customerid='$customerId' " +
-              "group by p.pid,p.code,p.item order by (case when sum(s.qty)>=0 then 1 else 0 end) desc, p.item";
+      itemselectionquery = " SELECT p.pid prid,p.code prcode,p.item pritem ,p.hsn hsn ,p.rate1 prrate1,sum(s.qty) qty, " +
+          "(cast(st.pstock as real)-IFNULL(x.slQty,0) ) ActStock ," +
+          "(case when sum(s.qty)>=0 then 1 else 0 end) sflag " +
+          "from 'productDetailsTable' p " +
+          "left join stockDetailsTable st on p.code=st.ppid and cast(st.pstock as real) >= 0 " +
+          "Left Join (Select sd.code slCode , sum(sd.qty) slQty from salesMasterTable sm " +
+          "Inner Join salesDetailTable sd on sm.sales_id=sd.sales_id " +
+          "where sm.sflag = 0 and sm.cancel=0 Group By sd.code) x on x.slCode= st.ppid " +
+          "left join 'salesBagTable' s on p.code  = s.code and s.customerid='$customerId' " +
+          "group by p.pid,p.code,p.item order by (case when sum(s.qty)>=0 then 1 else 0 end) desc, p.item";
     }
 
     // unitquery = "select k.*,b.*, (k.prbaserate * k.pkg ) prrate1 from (" +
@@ -2253,7 +2272,7 @@ class OrderAppDB {
         "Left Join (Select sd.code slCode , sum(sd.qty) slQty from salesMasterTable sm " +
         "Inner Join salesDetailTable sd on sm.sales_id=sd.sales_id " +
         "where sm.sflag = 0 and sm.cancel=0 Group By sd.code) x on x.slCode= st.ppid " +
-        "group by p.code,p.item order by p.item ";      
+        "group by p.code,p.item order by p.item ";
     print("stock report..$stockreport");
     result = await db.rawQuery(stockreport);
     print("stock report daat--${result}");
@@ -2784,6 +2803,8 @@ class OrderAppDB {
         " salesMasterTable.cancel as cancel_flag, " +
         " salesMasterTable.cancel_staff as cancel_staff, " +
         " salesMasterTable.cancel_dateTime as cancel_time," +
+        " salesMasterTable.cashdisc_per as cashdisc_per," +
+        " salesMasterTable.cashdisc_amt as cashdisc_amt," +
         "salesMasterTable.brrid || ' ' as brid" +
         " FROM salesMasterTable where salesMasterTable.status=0 ;";
     var res = await db.rawQuery("SELECT  * FROM  salesMasterTable");
@@ -2821,6 +2842,8 @@ class OrderAppDB {
         " salesMasterTable.cancel as cancel_flag, " +
         " salesMasterTable.cancel_staff as cancel_staff, " +
         " salesMasterTable.cancel_dateTime as cancel_time," +
+        " salesMasterTable.cashdisc_per as cashdisc_per," +
+        " salesMasterTable.cashdisc_amt as cashdisc_amt," +
         "salesMasterTable.brrid || ' ' as brid"
             " FROM salesMasterTable where salesMasterTable.sales_id=$sidd ;";
     var res = await db.rawQuery("SELECT  * FROM  salesMasterTable");

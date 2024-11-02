@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:sql_conn/sql_conn.dart';
+import 'package:sqlorder24/components/BlueTotth%20print/2blutoothPrint.dart';
 import 'package:sqlorder24/components/BlueTotth%20print/blutooth.dart';
 import 'package:sqlorder24/components/customSnackbar.dart';
 import 'package:sqlorder24/components/sunmi.dart';
@@ -318,7 +319,7 @@ class Controller extends ChangeNotifier {
   String? product_code;
   double? balance;
   bool connectedblu = false;
-
+  double totalAftrdiscount = 0.0;
   Map<String, dynamic>? datafromFile;
 //////////////////////////////REGISTRATION ///////////////////////////
   // Future<RegistrationData?> postRegistration(
@@ -2392,28 +2393,32 @@ class Controller extends ChangeNotifier {
 
 // /////////////////////////////INSERT into SALES bag and master table///////////////////////////////////////////////
   insertToSalesbagAndMaster(
-      String os,
-      String date,
-      String time,
-      String customer_id,
-      String staff_id,
-      String aid,
-      double total_price,
-      double gross_tot,
-      double tax_tot,
-      double dis_tot,
-      double cess_tot,
-      BuildContext context,
-      String payment_mode,
-      double roundoff,
-      String cancel_staff,
-      String cancel_time,
-      String branch_id
-      // double baserate,
-      ) async {
+    String os,
+    String date,
+    String time,
+    String customer_id,
+    String staff_id,
+    String aid,
+    double total_price,
+    double gross_tot,
+    double tax_tot,
+    double dis_tot,
+    double cess_tot,
+    BuildContext context,
+    String payment_mode,
+    double roundoff,
+    String cancel_staff,
+    String cancel_time,
+    String branch_id,
+    double cashdisc_per,
+    double cashdisc_amt,
+    // double baserate,
+  ) async {
     List<Map<String, dynamic>> om = [];
-    print("fhnjdroundoff---$roundoff");
+    print("roundoff---$roundoff");
     print("to sale bag-brnvhid-$branch_id");
+    print("to sale bag discper-$cashdisc_per");
+    print("to sale bag discAmount-$cashdisc_amt");
     // String salesOs = "S" + "$os";
     // int sales_id = await OrderAppDB.instance
     //     .getMaxCommonQuery('salesDetailTable', 'sales_id', "os='${os}'");
@@ -2475,74 +2480,89 @@ class Controller extends ChangeNotifier {
           0,
           cancel_staff,
           cancel_time,
-          branch_id.toString());
+          branch_id.toString(),
+          cashdisc_per,
+          cashdisc_amt,);
 
       for (var item in salebagList) {
         print("item....$item");
         double gross = item["unit_rate"] * item["qty"];
         await OrderAppDB.instance.insertsalesMasterandDetailsTable(
-            sales_id,
-            item["qty"],
-            item["rate"],
-            item["unit_rate"],
-            item["code"],
-            item["hsn"],
-            date,
-            time,
-            os,
-            customer_id,
-            "",
-            billNo,
-            staff_id,
-            aid,
-            0,
-            "",
-            "",
-            item["unit_name"],
-            rowNum,
-            "salesDetailTable",
-            item["itemName"],
-            gross,
-            item["discount_amt"],
-            item["discount_per"],
-            item["tax_amt"],
-            item["tax_per"],
-            item["cgst_per"],
-            item["cgst_amt"],
-            item["sgst_per"],
-            item["sgst_amt"],
-            item["igst_per"],
-            item["igst_amt"],
-            item["ces_amt"],
-            item["ces_per"],
-            0.0,
-            0.0,
-            0.0,
-            item["net_amt"],
-            0.0,
-            item["net_amt"],
-            roundoff,
-            0,
-            0,
-            0.0,
-            item["baserate"],
-            item["package"],
-            0,
-            cancel_staff,
-            cancel_time,
-            branch_id.toString());
+          sales_id,
+          item["qty"],
+          item["rate"],
+          item["unit_rate"],
+          item["code"],
+          item["hsn"],
+          date,
+          time,
+          os,
+          customer_id,
+          "",
+          billNo,
+          staff_id,
+          aid,
+          0,
+          "",
+          "",
+          item["unit_name"],
+          rowNum,
+          "salesDetailTable",
+          item["itemName"],
+          gross,
+          item["discount_amt"],
+          item["discount_per"],
+          item["tax_amt"],
+          item["tax_per"],
+          item["cgst_per"],
+          item["cgst_amt"],
+          item["sgst_per"],
+          item["sgst_amt"],
+          item["igst_per"],
+          item["igst_amt"],
+          item["ces_amt"],
+          item["ces_per"],
+          0.0,
+          0.0,
+          0.0,
+          item["net_amt"],
+          0.0,
+          item["net_amt"],
+          roundoff,
+          0,
+          0,
+          0.0,
+          item["baserate"],
+          item["package"],
+          0,
+          cancel_staff,
+          cancel_time,
+          branch_id.toString(),
+          cashdisc_per,
+          cashdisc_amt,
+        );
         rowNum = rowNum + 1;
       }
+
+      // await OrderAppDB.instance
+      //     .getOutstandingg(customer_id); /////customer Outstanding
     }
 
-    print("set----$settingsList1");
-    if (settingsList1[2]["set_value"] == "YES") {
-      // uploadSalesData(cid!, context, 0, "comomn popup");     /// 25sep
-      // uploadSalesDatasql(cid!, context, 0, "comomn popup");
+    await selectSettings("set_code in ('APP_DB_METHOD')");
+
+    if (settingsList1[0]["set_value"] == "ONLINE") {
+      print("Direct save and upload");
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? cmid = prefs.getString("cid");
+      await uploadSalesDatasql(cmid.toString(), context, 0, "");
     }
+    print("set----$settingsList1");
+    // if (settingsList1[2]["set_value"] == "YES") {
+    // uploadSalesData(cid!, context, 0, "comomn popup");     /// 25sep
+    // uploadSalesDatasql(cid!, context, 0, "comomn popup");
+    // }
     await OrderAppDB.instance.deleteFromTableCommonQuery(
         "salesBagTable", "os='${os}' AND customerid='${customer_id}'");
-
     salebagList.clear();
     notifyListeners();
     return sales_id;
@@ -2780,14 +2800,36 @@ class Controller extends ChangeNotifier {
   /////////////////// SELECT //////////////////////
   //////////////////////SELECT WALLET ////////////////////////////////////////////////////
 
-  fetchwallet() async {
-    walletList.clear();
-    var res = await OrderAppDB.instance
-        .selectAllcommon('walletTable', "waid not in (-3)");
-    for (var item in res) {
-      walletList.add(item);
-    }
-    print("fetch wallet-----$walletList");
+  fetchwallet(BuildContext context) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+      await selectSettings("set_code in ('APP_DB_METHOD')");
+      if (settingsList1[0]["set_value"] == "ONLINE") {
+        await getMasterData("wallet", context, 0, "");
+        walletList.clear();
+        notifyListeners();
+        var res = await OrderAppDB.instance
+            .selectAllcommon('walletTable', "waid not in (-3)");
+        for (var item in res) {
+          walletList.add(item);
+        }
+        print("wallet from online");
+      } else {
+        walletList.clear();
+        notifyListeners();
+        var res = await OrderAppDB.instance
+            .selectAllcommon('walletTable', "waid not in (-3)");
+        for (var item in res) {
+          walletList.add(item);
+        }
+        print("wallet from offline");
+      }
+      notifyListeners();
+      print("fetch wallet-----$walletList");
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {}
   }
 
   ////////////////////remark selection/////////
@@ -2947,30 +2989,56 @@ class Controller extends ChangeNotifier {
   }
 
   /////////////////////GET CUSTOMER////////////////////////////////
-  getCustomer(String? aid) async {
+  getCustomer(String? aid, BuildContext context) async {
     String arid;
     print("aid...............${aid}");
     try {
-      print("custmerDetails after clear----${custmerDetails}");
-      custmerDetails.clear();
-      if (aid == null) {
-        arid = ' ';
+      isLoading = true;
+      notifyListeners();
+      await selectSettings("set_code in ('APP_DB_METHOD')");
+      if (settingsList1[0]["set_value"] == "ONLINE") {
+        print("APP_DB_METHOD === ${settingsList1[0]["set_value"].toString()}");
+        await getMasterData("customer", context, 0, "");
+        print("custmerDetails after clear----${custmerDetails}");
+        custmerDetails.clear();
+        if (aid == null) {
+          arid = ' ';
+        } else {
+          arid = aid;
+        }
+        customerList = await OrderAppDB.instance.getCustomer(arid);
+        print("customerList----${customerList}");
+        for (var item in customerList) {
+          custmerDetails.add(item);
+        }
+        print("custmr length----${custmerDetails.length}");
+        print("custmerDetails adding $custmerDetails");
+        notifyListeners();
       } else {
-        arid = aid;
+        print("custmerDetails after clear----${custmerDetails}");
+        custmerDetails.clear();
+        if (aid == null) {
+          arid = ' ';
+        } else {
+          arid = aid;
+        }
+        customerList = await OrderAppDB.instance.getCustomer(arid);
+        print("customerList----${customerList}");
+        for (var item in customerList) {
+          custmerDetails.add(item);
+        }
+        print("custmr length----${custmerDetails.length}");
+        print("custmerDetails adding $custmerDetails");
+        notifyListeners();
+
+        // notifyListeners();
       }
-      customerList = await OrderAppDB.instance.getCustomer(arid);
-      print("customerList----${customerList}");
-      for (var item in customerList) {
-        custmerDetails.add(item);
-      }
-      print("custmr length----${custmerDetails.length}");
-      print("custmerDetails adding $custmerDetails");
+      isLoading = false;
       notifyListeners();
     } catch (e) {
       print(e);
       return null;
     }
-    notifyListeners();
   }
 
   ////////////////////////////////////////
@@ -2989,7 +3057,7 @@ class Controller extends ChangeNotifier {
 
     try {
       isLoading = true;
-      // notifyListeners();
+      notifyListeners();
       prodctItems =
           await OrderAppDB.instance.selectfromOrderbagTable(customerId);
       print("product item list in orderlist----${prodctItems}");
@@ -3114,47 +3182,89 @@ class Controller extends ChangeNotifier {
   // }
 
 /////////////////////////////////////////////////////////////////
-  getSaleProductList(String customerId) async {
+  getSaleProductList(String customerId, BuildContext context) async {
     print("customer id......$customerId");
     print("haii---");
     int flag = 0;
     productName.clear();
     try {
       isLoading = true;
-      // notifyListeners();
-      prodctItems =
-          await OrderAppDB.instance.selectfromsalebagTable(customerId);
-      print("prodctItems-salesbag---${prodctItems}");
-      productName.clear();
-      for (var i in prodctItems) {
-        productName.add(i);
-      }
-      var length = productName.length;
-      print("product item listttttt....................${productName}");
-
-      print("text length-------$length");
-      qty = List.generate(length, (index) => TextEditingController());
-      // coconutRate = List.generate(length, (index) => TextEditingController());
-      // listDropdown=List.generate(length, (index) => DropdownButton())
-      selected = List.generate(length, (index) => false);
-      // returnselected = List.generate(length, (index) => false);
-      for (int i = 0; i < productName.length; i++) {
-        if (productName[i]["qty"] != null || productName[i]["qty"] == 0) {
-          qty[i].text = productName[i]["qty"].toString();
-        } else {
-          qty[i].text = "0";
-          // notifyListeners();
+      notifyListeners();
+      await selectSettings("set_code in ('APP_DB_METHOD')");
+      if (settingsList1[0]["set_value"] == "ONLINE") {
+        await getMasterData("products", context, 0, "");
+        // await getMasterData("stock", context, 0, "");
+        // notifyListeners();
+        prodctItems =
+            await OrderAppDB.instance.selectfromsalebagTable(customerId);
+        print("prodctItems-salesbag---${prodctItems}");
+        productName.clear();
+        for (var i in prodctItems) {
+          productName.add(i);
         }
-        print("new quantity-------${qty[i].text}");
-      }
-      // for (int i = 0; i < productName.length; i++) {
-      //   coconutRate[i].text = productName[i]['prrate1'].toString();
-      // }
-      isLoading = false;
-      notifyListeners();
-      print("product name----${productName}");
+        var length = productName.length;
+        print("product item listttttt....................${productName}");
 
-      notifyListeners();
+        print("text length-------$length");
+        qty = List.generate(length, (index) => TextEditingController());
+        // coconutRate = List.generate(length, (index) => TextEditingController());
+        // listDropdown=List.generate(length, (index) => DropdownButton())
+        selected = List.generate(length, (index) => false);
+        // returnselected = List.generate(length, (index) => false);
+        for (int i = 0; i < productName.length; i++) {
+          if (productName[i]["qty"] != null || productName[i]["qty"] == 0) {
+            qty[i].text = productName[i]["qty"].toString();
+          } else {
+            qty[i].text = "0";
+            // notifyListeners();
+          }
+          print("new quantity-------${qty[i].text}");
+        }
+        // for (int i = 0; i < productName.length; i++) {
+        //   coconutRate[i].text = productName[i]['prrate1'].toString();
+        // }
+        isLoading = false;
+        notifyListeners();
+        print("product name----${productName}");
+
+        notifyListeners();
+      } else {
+        // isLoading = true;
+        // notifyListeners();
+        prodctItems =
+            await OrderAppDB.instance.selectfromsalebagTable(customerId);
+        print("prodctItems-salesbag---${prodctItems}");
+        productName.clear();
+        for (var i in prodctItems) {
+          productName.add(i);
+        }
+        var length = productName.length;
+        print("product item listttttt....................${productName}");
+
+        print("text length-------$length");
+        qty = List.generate(length, (index) => TextEditingController());
+        // coconutRate = List.generate(length, (index) => TextEditingController());
+        // listDropdown=List.generate(length, (index) => DropdownButton())
+        selected = List.generate(length, (index) => false);
+        // returnselected = List.generate(length, (index) => false);
+        for (int i = 0; i < productName.length; i++) {
+          if (productName[i]["qty"] != null || productName[i]["qty"] == 0) {
+            qty[i].text = productName[i]["qty"].toString();
+          } else {
+            qty[i].text = "0";
+            // notifyListeners();
+          }
+          print("new quantity-------${qty[i].text}");
+        }
+        // for (int i = 0; i < productName.length; i++) {
+        //   coconutRate[i].text = productName[i]['prrate1'].toString();
+        // }
+        isLoading = false;
+        notifyListeners();
+        print("product name----${productName}");
+
+        notifyListeners();
+      }
     } catch (e) {
       print(e);
     }
@@ -3254,11 +3364,12 @@ class Controller extends ChangeNotifier {
     generateTextEditingController("sales");
     print("salebagList vxdvxd----$salebagList");
     if (type == "from save") {
-      if (salebagLength > 0) {
-        print("value.salnjjjj-----}");
-        paysheet.showpaymentSheet(context, areaId, areaName, customerId, s[0],
-            s[1], " ", " ", orderTotal2[11], branch_id);
-      }
+      //added on nov1
+      // if (salebagLength > 0) {
+      //   print("value.salnjjjj-----}");
+      //   paysheet.showpaymentSheet(context, areaId, areaName, customerId, s[0],
+      //       s[1], " ", " ", orderTotal2[11], branch_id);
+      // }
     }
 
     isCartLoading = false;
@@ -3540,12 +3651,10 @@ class Controller extends ChangeNotifier {
       print("result sale...${res[10].runtimeType}");
       roundoff = res[10];
       print("result sale.22..${roundoff}");
-
       salesTotal = roundoff + sTotal;
-
+      totalAftrdiscount = salesTotal; //added on nov1
       print(
           "result sal-----......$roundoff....${salesTotal}----${gross_tot}---${tax_tot}---${cess_tot}--${dis_tot}");
-
       print("salesTotal---$salesTotal");
       notifyListeners();
       orderTotal2.clear();
@@ -4562,7 +4671,7 @@ class Controller extends ChangeNotifier {
             DateTime parsedDate = DateTime.parse(dateTimeString);
             String formattedDate = DateFormat('dd-MMM-yyyy').format(parsedDate);
             ommastrString =
-                "('${ommastr['billno']}',${ommastr['s_id']},'${ommastr['billno']}','${ommastr['cuid']}','$formattedDate','${ommastr['staff_id']}',${ommastr['aid']},'${ommastr['cus_type']}','${ommastr['gross_tot']}','${ommastr['dis_tot']}','${ommastr['ces_tot']}','${ommastr['tax_tot']}',${ommastr['p_mode']},0,'${ommastr['rounding']}','${ommastr['net_amt']}','$dateNow',${ommastr['cancel_flag']},'${ommastr['cancel_time']}','${ommastr['cancel_staff']}',0,0,${ommastr['brid']})";
+                "('${ommastr['billno']}',${ommastr['s_id']},'${ommastr['billno']}','${ommastr['cuid']}','$formattedDate','${ommastr['staff_id']}',${ommastr['aid']},'${ommastr['cus_type']}','${ommastr['gross_tot']}','${ommastr['dis_tot']}','${ommastr['ces_tot']}','${ommastr['tax_tot']}',${ommastr['p_mode']},0,'${ommastr['rounding']}','${ommastr['net_amt']}','$dateNow',${ommastr['cancel_flag']},'${ommastr['cancel_time']}','${ommastr['cancel_staff']}',0,0,${ommastr['brid']},'${ommastr['cashdisc_per']}','${ommastr['cashdisc_amt']}')";
             print(ommastrString);
             omDetString = "";
             resultQuery =
@@ -4590,7 +4699,7 @@ class Controller extends ChangeNotifier {
                   "DELETE from  [sale_details] WHERE [s_invoice_id]='$itembillno'");
               print("delete result---$res2 , $res22");
               var res = await SqlConn.writeData(
-                  "INSERT INTO [sale_master]([s_invoice_id],[s_id],[bill_no],[s_customer_id],[s_entry_date],[staff_id],[area_id],[s_cus_type],[s_gross_total],[s_dis_total],[s_ces_total],[s_tax_tot],[trans_mode],[c_option],[rounding],[net_amt],[sys_date],[cancel_flag],[cancel_time],[cancel_staff],[statusid],[TRANSFERONLINE],[br_id]) VALUES $ommastrString");
+                  "INSERT INTO [sale_master]([s_invoice_id],[s_id],[bill_no],[s_customer_id],[s_entry_date],[staff_id],[area_id],[s_cus_type],[s_gross_total],[s_dis_total],[s_ces_total],[s_tax_tot],[trans_mode],[c_option],[rounding],[net_amt],[sys_date],[cancel_flag],[cancel_time],[cancel_staff],[statusid],[TRANSFERONLINE],[br_id],[cashdisc_per],[cashdisc_amt]) VALUES $ommastrString");
               var resdet = await SqlConn.writeData(
                   "INSERT INTO [sale_details]([s_invoice_id],[slno],[code],[hsn],[item],[qty],[packing],[rate],[unit],[unit_rate],[gross],[disc_per],[disc_amt],[cgst_per],[cgst_amt],[sgst_per],[sgst_amt],[igst_per],[igst_amt],[tax_per],[tax_amt],[ces_per],[ces_amt],[net_amt],[status],[UPDATED]) VALUES $omDetString");
               f = 1;
@@ -4611,12 +4720,16 @@ class Controller extends ChangeNotifier {
 
                 await generateSalesInvoice(context);
                 isUpload = false;
-                isUp[index!] = true;
+                if (page == "upload page") {
+                  isUp[index!] = true;
+                }
                 isLoading = false;
                 notifyListeners();
               } else {
                 isUpload = false;
-                isUp[index!] = true;
+                if (page == "upload page") {
+                  isUp[index!] = true;
+                }
                 isLoading = false;
                 notifyListeners();
                 snackbar.showSnackbar(context, "Upload Failed..", "");
@@ -5495,9 +5608,9 @@ class Controller extends ChangeNotifier {
     igst_amt = (gross - disc_amt) * (igst_per / 100);
     cess = (gross - disc_amt) * (cess_per / 100);
     net_amt = ((gross - disc_amt) + tax + cess);
-    if (net_amt < 0) {
-      net_amt = 0.00;
-    }
+    // if (net_amt < 0) {
+    //   net_amt = 0.00;
+    // }
     print("netamount.cal...$net_amt");
 
     print(
@@ -5759,7 +5872,7 @@ class Controller extends ChangeNotifier {
       BuildContext context,
       Map<String, dynamic> salesMasterData,
       String? areaName,
-      String isCancelled) async {
+      String isCancelled,double balncfromsave) async {
     List<Map<String, dynamic>> taxableData = [];
     List<Map<String, dynamic>> resultQuery = [];
 
@@ -5781,9 +5894,8 @@ class Controller extends ChangeNotifier {
     printSalesData["master"] = salesMasterData;
     printSalesData["detail"] = resultQuery;
     printSalesData["taxable_data"] = taxableData;
-
     print("result salesMasterData----$printSalesData");
-
+    print("ba runtimetype------${printSalesData["master"]["ba"].runtimeType}");
     await setConnect("DC:0D:30:63:DB:A6");
 
     ///MAC
@@ -5791,8 +5903,8 @@ class Controller extends ChangeNotifier {
     if (connectedblu) {
       print("printer connected");
       BluePrint bl = BluePrint();
-      bl.printRecee(
-          printSalesData, salesMasterData["payment_mode"], isCancelled, 0.0);
+      bl.printRecee(printSalesData, salesMasterData["payment_mode"],
+          isCancelled, balncfromsave);
       // printer.printReceipt(
       //     printSalesData, salesMasterData["payment_mode"], isCancelled, 0.0);
       // Navigator.push(
@@ -5815,7 +5927,6 @@ class Controller extends ChangeNotifier {
                 ),
           );
         });
-
         await EasyLoading.dismiss();
       }
     } else {
@@ -5832,23 +5943,20 @@ class Controller extends ChangeNotifier {
     final String? result = await BluetoothThermalPrinter.connect(mac);
     print("state conneected $result");
     // return result;
-    if (result == "true") 
-    {
+    if (result == "true") {
       connectedblu = true;
       notifyListeners();
     }
   }
 
   ////////////////////////////////////////////////////////////
-  fromSalesbagTable_X001(String custmerId, String type) async 
-  {  
+  fromSalesbagTable_X001(String custmerId, String type) async {
     print("dgsdgg---$type");
     var res =
         await OrderAppDB.instance.selectfromsalebagTable_X001(custmerId, type);
     salesitemList2.clear();
 
-    for (var item in res) 
-    {
+    for (var item in res) {
       salesitemList2.add(item);
     }
     salesrate_X001 = List.generate(

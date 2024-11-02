@@ -11,7 +11,6 @@ class RegistrationData {
   RegistrationData.fromJson(Map<String, dynamic> json) {
     cid = json['cid'];
     type = json['type'];
-
     fp = json['fp'];
     os = json['os'];
     if (json['c_d'] != null) {

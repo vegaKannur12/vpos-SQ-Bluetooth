@@ -26,7 +26,8 @@ class SaleItemDetails {
       String customerId,
       String os,
       double pkg,
-      String unit_name,String branch_id) {
+      String unit_name,
+      String branch_id) {
     return showModalBottomSheet(
         isScrollControlled: true,
         context: context,
@@ -151,8 +152,8 @@ class SaleItemDetails {
                                               true,
                                               "qty");
                                       Provider.of<Controller>(context,
-                                                listen: false)
-                                            .fromDb = false;
+                                              listen: false)
+                                          .fromDb = false;
                                     },
                                   ),
                                   Container(
@@ -227,7 +228,7 @@ class SaleItemDetails {
                                       double q = double.parse(
                                           value.salesqty[index].text);
                                       q = q - 1;
-                                      if (q >= 0) {
+                                      // if (q >= 0) {
                                         value.salesqty[index].text =
                                             q.toString();
                                         Provider.of<Controller>(context,
@@ -248,12 +249,12 @@ class SaleItemDetails {
                                                 index,
                                                 true,
                                                 "qty");
-                                      } else {
-                                        // value.qty[index].text = "0";
-                                      }
-                                     Provider.of<Controller>(context,
-                                                listen: false)
-                                            .fromDb = false;
+                                      // } else {
+                                      //   // value.qty[index].text = "0";
+                                      // }
+                                      Provider.of<Controller>(context,
+                                              listen: false)
+                                          .fromDb = false;
                                     },
                                   ),
                                 ],
@@ -510,7 +511,6 @@ class SaleItemDetails {
                                     isDense: true,
                                     contentPadding: EdgeInsets.all(
                                         0), //  <- you can it to 0.0 for no space
-
                                     //border: InputBorder.none
                                   ),
                                   keyboardType: TextInputType.number,
@@ -579,11 +579,12 @@ class SaleItemDetails {
                                 style: TextStyle(fontSize: 15),
                               ),
                               Spacer(),
-                              tax_amt < 0.00
-                                  ? Text(
-                                      "\u{20B9}0.00",
-                                    )
-                                  : Text(
+                              // tax_amt < 0.00
+                              //     ? Text(
+                              //         "\u{20B9}0.00",
+                              //       )
+                                  // : 
+                                  Text(
                                       value.fromDb!
                                           ? "\u{20B9}${tax_amt.toStringAsFixed(2)}"
                                           : "\u{20B9}${value.tax.toStringAsFixed(2)}",
@@ -617,11 +618,12 @@ class SaleItemDetails {
                                 style: TextStyle(fontSize: 15),
                               ),
                               Spacer(),
-                              cess_amt < 0.00
-                                  ? Text(
-                                      "\u{20B9}0.00",
-                                    )
-                                  : Text(
+                              // cess_amt < 0.00
+                              //     ? Text(
+                              //         "\u{20B9}0.00",
+                              //       )
+                              //     : 
+                                  Text(
                                       value.fromDb!
                                           ? "\u{20B9}${cess_amt.toStringAsFixed(2)}"
                                           : "\u{20B9}${value.cess.toStringAsFixed(2)}",
@@ -642,13 +644,14 @@ class SaleItemDetails {
                                   color: P_Settings.extracolor, fontSize: 15),
                             ),
                             Spacer(),
-                            net_amt < 0.00
-                                ? Text("\u{20B9}0.00",
-                                    style: TextStyle(
-                                        color: P_Settings.extracolor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15))
-                                : Text(
+                            // net_amt < 0.00
+                            //     ? Text("\u{20B9}0.00",
+                            //         style: TextStyle(
+                            //             color: P_Settings.extracolor,
+                            //             fontWeight: FontWeight.bold,
+                            //             fontSize: 15))
+                            //     : 
+                                Text(
                                     value.fromDb!
                                         ? "\u{20B9}${net_amt.toStringAsFixed(2)}"
                                         : "\u{20B9}${value.net_amt.toStringAsFixed(2)}",
@@ -665,31 +668,33 @@ class SaleItemDetails {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                  width: size.width * 0.4,
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: P_Settings.salewaveColor,
-                                      ),
-                                      onPressed: () async {
-                                        // int indexCalc = index + 1;
-                                        print(
-                                            "indexxxxxx.${value.discount_amount[index].text}");
-                                        await OrderAppDB.instance.upadteCommonQuery(
-                                            "salesBagTable",
-                                            "rate=${value.salesrate[index].text},unit_rate=${value.taxable_rate},net_amt=${value.net_amt},discount_per=${value.discount_prercent[index].text},discount_amt=${value.discount_amount[index].text},qty=${value.salesqty[index].text},totalamount=${value.gross},tax_amt=${value.tax},cgst_amt=${value.cgst_amt},sgst_amt=${value.sgst_amt},igst_amt=${value.igst_amt}",
-                                            "code='$code' and customerid='$customerId' and unit_name='$unit_name'");
-                                        print("calculate new total");
-                                        await Provider.of<Controller>(context,
-                                                listen: false)
-                                            .calculatesalesTotal(
-                                                os, customerId);
-                                        Provider.of<Controller>(context,
-                                                listen: false)
-                                            .getSaleBagDetails(customerId, os,"",context,"","",branch_id);
+                                width: size.width * 0.4,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: P_Settings.salewaveColor,
+                                  ),
+                                  onPressed: () async {
+                                    // int indexCalc = index + 1;
+                                    print(
+                                        "indexxxxxx.${value.discount_amount[index].text}");
+                                    await OrderAppDB.instance.upadteCommonQuery(
+                                        "salesBagTable",
+                                        "rate=${value.salesrate[index].text},unit_rate=${value.taxable_rate},net_amt=${value.net_amt},discount_per=${value.discount_prercent[index].text},discount_amt=${value.discount_amount[index].text},qty=${value.salesqty[index].text},totalamount=${value.gross},tax_amt=${value.tax},cgst_amt=${value.cgst_amt},sgst_amt=${value.sgst_amt},igst_amt=${value.igst_amt}",
+                                        "code='$code' and customerid='$customerId' and unit_name='$unit_name'");
+                                    print("calculate new total");
+                                    await Provider.of<Controller>(context,
+                                            listen: false)
+                                        .calculatesalesTotal(os, customerId);
+                                    Provider.of<Controller>(context,
+                                            listen: false)
+                                        .getSaleBagDetails(customerId, os, "",
+                                            context, "", "", branch_id);
 
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("Apply")))
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("Apply"),
+                                ),
+                              )
                             ],
                           ),
                         ),

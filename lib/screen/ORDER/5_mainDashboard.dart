@@ -95,7 +95,8 @@ class _MainDashboardState extends State<MainDashboard> {
               return SpinKitFadingCircle(
                 color: P_Settings.wavecolor,
               );
-            } else {
+            } 
+            else {
               return Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
@@ -549,7 +550,31 @@ class _MainDashboardState extends State<MainDashboard> {
             return AlertDialog(
               content: Consumer<Controller>(builder: (context, value, child) {
                 if (value.isLoading) {
-                  return const CircularProgressIndicator();
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        // color: Colors.white,
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Wait ",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SpinKitCircle(
+                                color: Colors.black,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
                 } else {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
@@ -560,13 +585,14 @@ class _MainDashboardState extends State<MainDashboard> {
                         child: DropdownButton<String>(
                           value: selected,
                           // isDense: true,
-                          hint: const Text("Select"),
+                          hint: Text("Select"),
                           // isExpanded: true,
                           autofocus: false,
-                          underline: const SizedBox(),
+                          underline: SizedBox(),
                           elevation: 0,
                           items: value.areDetails
-                              .map((item) => DropdownMenuItem<String>(
+                              .map(
+                                (item) => DropdownMenuItem<String>(
                                   value: item["aid"].toString(),
                                   child: SizedBox(
                                     width: size.width * 0.5,
@@ -574,9 +600,12 @@ class _MainDashboardState extends State<MainDashboard> {
                                       item["aname"].toString(),
                                       style: const TextStyle(fontSize: 14),
                                     ),
-                                  )))
+                                  ),
+                                ),
+                              )
                               .toList(),
-                          onChanged: (item) {
+                          onChanged: (item) 
+                          {
                             print("clicked");
 
                             if (item != null) {
@@ -608,8 +637,9 @@ class _MainDashboardState extends State<MainDashboard> {
                             } else {
                               gen_condition = " ";
                             }
-                            Provider.of<Controller>(context, listen: false)
-                                .getCustomer(genArea!);
+                            // await Provider.of<Controller>(context,
+                            //         listen: false)
+                            //     .getCustomer(genArea!, context);
                             // Provider.of<Controller>(context, listen: false)
                             //     .todayOrder(s[0], gen_condition!);
                             Provider.of<Controller>(context, listen: false)

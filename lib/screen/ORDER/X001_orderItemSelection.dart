@@ -212,7 +212,7 @@ class _X001OrderItemSelectionState extends State<X001OrderItemSelection> {
                 .clear();
             Provider.of<Controller>(context, listen: false).searchkey = "";
             Provider.of<Controller>(context, listen: false).newList = products;
-            Provider.of<Controller>(context, listen: false).fetchwallet();
+            Provider.of<Controller>(context, listen: false).fetchwallet(context);
             Navigator.of(context).pop();
           },
         ),

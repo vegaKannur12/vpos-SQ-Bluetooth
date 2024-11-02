@@ -229,7 +229,10 @@ class _CollectionPageState extends State<CollectionPage> {
                             color: P_Settings.collection,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(value.balance.toString()),
+                              child: Text(value.balance.toString() == "null" ||
+                                      value.balance.toString() == ""
+                                  ? "0.0"
+                                  : value.balance.toString()),
                             ),
                           ),
                           SizedBox(
@@ -383,15 +386,13 @@ class _CollectionPageState extends State<CollectionPage> {
                                               listen: false)
                                           .dashboardSummery(sid!, s[0],
                                               value.areaidFrompopup!, context);
-                                    }                                   
-                                    else 
-                                    {
+                                    } else {
                                       await Provider.of<Controller>(context,
                                               listen: false)
                                           .dashboardSummery(
                                               sid!, s[0], "", context);
                                     }
-                                    
+
                                     // Provider.of<Controller>(context,
                                     //         listen: false)
                                     //     .mainDashtileValues(sid!, s[0]);

@@ -40,7 +40,8 @@ class SalesItem extends StatefulWidget {
       required this.type,
       required this.gtype,
       required this.branch_id
-      });
+      }
+      );
 
   @override
   State<SalesItem> createState() => _SalesItemState();
@@ -57,7 +58,7 @@ class _SalesItemState extends State<SalesItem> {
   double? newqty = 0.0;
   TextEditingController searchcontroll = TextEditingController();
   ShowModal showModal = ShowModal();
-  SaleItemDetails saleDetails = SaleItemDetails();
+  // SaleItemDetails saleDetails = SaleItemDetails();
   List<Map<String, dynamic>> products = [];
   SearchTile search = SearchTile();
   DateTime now = DateTime.now();
@@ -121,8 +122,7 @@ class _SalesItemState extends State<SalesItem> {
                           FocusManager.instance.primaryFocus?.unfocus();
                           Provider.of<Controller>(context, listen: false)
                               .selectSettings(
-                                  "set_code in ('SL_RATE_EDIT','SL_TAX_CALC','SL_UPLOAD_DIRECT') ");
-
+                                  "set_code in ('SL_RATE_EDIT','SL_TAX_CALC','SL_UPLOAD_DIRECT') ");                                 
                           Provider.of<Controller>(context, listen: false)
                               .getSaleBagDetails(widget.customerId, widget.os,
                                   "", context, widget.areaId, widget.areaName,widget.branch_id);
@@ -230,7 +230,7 @@ class _SalesItemState extends State<SalesItem> {
                 .clear();
             Provider.of<Controller>(context, listen: false).searchkey = "";
             Provider.of<Controller>(context, listen: false).newList = products;
-            Provider.of<Controller>(context, listen: false).fetchwallet();
+            Provider.of<Controller>(context, listen: false).fetchwallet(context);
             Navigator.of(context).pop();
           },
         ),
@@ -490,6 +490,7 @@ class _SalesItemState extends State<SalesItem> {
                                           //         value.salesitemList2[
                                           //                 index]
                                           //             ["prid"]);
+                                          
                                           await Provider.of<Controller>(context,
                                                   listen: false)
                                               .fromSalesListData_X001(
