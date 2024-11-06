@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sql_conn/sql_conn.dart';
 import 'package:sqlorder24/db_helper.dart';
+import 'package:sqlorder24/screen/ORDER/externalDir.dart';
 
 class TableList extends StatefulWidget {
   final List<Map<String, dynamic>> list;
@@ -17,6 +18,7 @@ class _TableListState extends State<TableList> {
   String? port;
   String? un;
   String? pw;
+  ExternalDir externalDir = ExternalDir();
   @override
   void initState() {
     // TODO: implement initState
@@ -25,12 +27,25 @@ class _TableListState extends State<TableList> {
   }
 
   getSecondDBDetails() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    db = prefs.getString("conDb");
-    ip = prefs.getString("conIp");
-    port = prefs.getString("conPort");
-    un = prefs.getString("conUsr");
-    pw = prefs.getString("conPass");
+    Map<String, dynamic>? temp = await externalDir.fileRead();
+    TextEditingController dbc = TextEditingController();
+    TextEditingController ipc = TextEditingController();
+    TextEditingController usrc = TextEditingController();
+    TextEditingController portc = TextEditingController();
+    TextEditingController pwdc = TextEditingController();
+    bool pressed = false;
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    db = temp!["DB"];
+    ip = temp!["IP"];
+    port = temp!["PORT"];
+    un = temp!["USR"];
+    pw = temp!["PWD"];
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // db = prefs.getString("conDb");
+    // ip = prefs.getString("conIp");
+    // port = prefs.getString("conPort");
+    // un = prefs.getString("conUsr");
+    // pw = prefs.getString("conPass");
     print("+++++ $db---$ip----$port----$un------$pw");
   }
 
@@ -163,23 +178,23 @@ class _TableListState extends State<TableList> {
                                   }
                                 } catch (e) {
                                   showDialog(
-                                      context: context,
-                                      builder: (ctx) => AlertDialog(
-                                        content:  Text("${e.toString()}"),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(ctx).pop();
-                                            },
-                                            child: Container(
-                                              color: Colors.green,
-                                              padding: const EdgeInsets.all(14),
-                                              child: const Text("OK"),
-                                            ),
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      content: Text("${e.toString()}"),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(ctx).pop();
+                                          },
+                                          child: Container(
+                                            color: Colors.green,
+                                            padding: const EdgeInsets.all(14),
+                                            child: const Text("OK"),
                                           ),
-                                        ],
-                                      ),
-                                    );
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                   debugPrint(
                                       "Errorrrrrrrrrrrrrrrrrr------>>>>${e.toString()}");
                                 }

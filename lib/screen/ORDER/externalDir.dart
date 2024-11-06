@@ -81,31 +81,39 @@ Future<Map<String, dynamic>> fileRead() async {
   Directory? extDir = await getExternalStorageDirectory();
   String dirPath = '${extDir!.path}/VgFp';
   dirPath = dirPath.replaceAll("Android/data/com.example.sqlorder24/files/", "");
+  print("reading from----$dirPath");
   final File file = File('${dirPath}/dbDetails.txt');
-
+   print("reading file----$file");
   // Check if the file exists
-  if (await file.exists()) {
+  if (await file.exists()) 
+  {
     String jsonString = await file.readAsString(); // Read the file as a string
     Map<String, dynamic> data = jsonDecode(jsonString); // Convert JSON string back to Map
     print("File read with data: $data");
     return data;
-  } else
-   {
+  } 
+  else
+  {
     print("File does not exist");
     return {}; // Return empty map if file doesn't exist
   }
 }
+
 Future<void> deleteFile() async {
   Directory? extDir = await getExternalStorageDirectory();
   String dirPath = '${extDir!.path}/VgFp';
   dirPath = dirPath.replaceAll("Android/data/com.example.sqlorder24/files/", "");
+  print("deleting from----$dirPath");
   final File file = File('${dirPath}/dbDetails.txt');
-
+   print("deleting file----$file");
   // Check if the file exists
-  if (await file.exists()) {
+  if (await file.exists()) 
+  {
     await file.delete(); // Delete the file
     print("File deleted successfully.");
-  } else {
+  } 
+  else 
+  {
     print("File does not exist.");
   }
 }
@@ -144,23 +152,26 @@ Future<void> deleteFile() async {
 //     print("New file created with data: $jsonString");
 //   }
 // }
-Future<void> fileWrite(Map<String, dynamic> data) async {
+Future<void> fileWrite(Map<String, dynamic> data) async 
+{
   Directory? extDir = await getExternalStorageDirectory();
   String dirPath = '${extDir!.path}/VgFp';
   dirPath = dirPath.replaceAll("Android/data/com.example.sqlorder24/files/", "");
   await Directory(dirPath).create(recursive: true);
-
+  print("writing to----$dirPath");
   final File file = File('${dirPath}/dbDetails.txt'); //dbDet.txt
-
+  print("writing to file----$file");
   // Convert the map to JSON string
   String jsonString = jsonEncode(data);
-
   // Check if file exists and overwrite or create new
-  if (await file.exists()) {
+  if (await file.exists()) 
+  {
     // Overwrite existing file
     await file.writeAsString(jsonString, mode: FileMode.write, flush: true);
     print("File overwritten with data: $jsonString");
-  } else {
+  }
+  else 
+  {
     // Create and write new file
     await file.writeAsString(jsonString, flush: true);
     print("New file created with data: $jsonString");

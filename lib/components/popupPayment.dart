@@ -16,6 +16,7 @@ class PaymentSelect {
     String branch_id,
     double cashdisc_per,
     double cashdisc_amt,
+    double tot_aftr_disc,
   ) {
     Size size = MediaQuery.of(context).size;
     String? payment_mode;
@@ -63,7 +64,7 @@ class PaymentSelect {
                               payment_mode!,
                               branch_id,
                               cashdisc_per,
-                              cashdisc_amt,
+                              cashdisc_amt,tot_aftr_disc
                             ),
                           );
                           print(
@@ -100,7 +101,7 @@ class PaymentSelect {
                               payment_mode!,
                               branch_id,
                               cashdisc_per,
-                              cashdisc_amt,
+                              cashdisc_amt,tot_aftr_disc
                             ),
                           );
                           // print("payment mode...........$payment_mode");
@@ -121,7 +122,6 @@ class PaymentSelect {
                 //     onPressed: () {
                 //       print(
                 //           "payment_mode...${payment_mode}");
-
                 //     }),
               ],
             ),

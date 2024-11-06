@@ -37,8 +37,10 @@ class _SplashScreenState extends State<SplashScreen>
   String? com_cid;
   String? tempFp1;
   ExternalDir externalDir = ExternalDir();
+  Map<String, dynamic>? temp ;
 
   navigate() async {
+    temp = await externalDir.fileRead();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     cid = prefs.getString("company_id");
     os = prefs.getString("os");
@@ -64,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen>
           "menu index from splash----->${Provider.of<Controller>(context, listen: false).menu_index}");
     }
 
-    Map<String, dynamic>? temp = await externalDir.fileRead();
+  
 
     await Future.delayed(Duration(seconds: 3), () async {
       print("stored db details--->${temp}");
@@ -72,9 +74,10 @@ class _SplashScreenState extends State<SplashScreen>
           context,
           PageRouteBuilder(
               opaque: false, // set to false
-              pageBuilder: (_, __, ___) {
+              pageBuilder: (_, __, ___) 
+              {
                 print("data from file------------$temp----");
-                if (temp != null && temp.isNotEmpty && temp != {} && cid!=null) {
+                if (temp != null && temp!.isNotEmpty && temp != {} && cid!=null) {
                   if (st_uname != null &&
                       st_pwd != null &&
                       staffLog != null &&
@@ -85,7 +88,9 @@ class _SplashScreenState extends State<SplashScreen>
                   }
                   // return Dashboard();
                   // // StaffLogin();
-                } else {
+                }
+                 else 
+                {
                   print("not valid user");
                   return NextPage();
                 }
@@ -97,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    
     // Provider.of<Controller>(context, listen: false).getfilefromStorage();
     navigate();
   }

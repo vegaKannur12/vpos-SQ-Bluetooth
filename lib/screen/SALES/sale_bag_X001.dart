@@ -46,7 +46,8 @@ class _SaleCartX001State extends State<SaleCartX001> {
   int counter = 0;
   bool isAdded = false;
   String? sname;
-  double discInRupee = 0.0;
+  double discInRupee = 0.00;
+  String discInPercentage = "";
   // double totalAftrdiscount = 0.0;
 
   ////////////////////////////////////////////////////////
@@ -267,7 +268,7 @@ class _SaleCartX001State extends State<SaleCartX001> {
                                   Text(" Disc : "),
                                   Flexible(
                                     child: TextFormField(
-                                      decoration: InputDecoration(
+                                      decoration: InputDecoration(labelText: "%",
                                           filled: true,
                                           fillColor: Colors.white,
                                           focusedBorder: OutlineInputBorder(
@@ -297,8 +298,17 @@ class _SaleCartX001State extends State<SaleCartX001> {
                                           ),
                                           hintText: "%"),
                                       controller: discPerCtrl,
+                                      onChanged: (value) async {
+                                        if (value.isEmpty) {
+                                          setState(() {
+                                            discInRupee = 0.00;
+                                            discRupeeCtrl.clear();
+                                          });
+                                          await calcDiscount(0.0);
+                                        }
+                                      },
                                       // onFieldSubmitted: (value) {
-                                      //   convertToKG(
+                                      //   convertToRupee(
                                       //       discPerCtrl.text.toString().trim(),
                                       //       "per");
                                       //   setState(() {});
@@ -308,7 +318,7 @@ class _SaleCartX001State extends State<SaleCartX001> {
                                   ),
                                   Flexible(
                                     child: TextFormField(
-                                      decoration: InputDecoration(
+                                      decoration: InputDecoration(labelText: "₹",
                                           filled: true,
                                           fillColor: Colors.white,
                                           hoverColor: Colors.white,
@@ -339,8 +349,17 @@ class _SaleCartX001State extends State<SaleCartX001> {
                                           ),
                                           hintText: "₹"),
                                       controller: discRupeeCtrl,
+                                        onChanged: (value) async {
+                                        if (value.isEmpty) {
+                                          setState(() {
+                                            discInRupee = 0.00;
+                                            discPerCtrl.clear();
+                                          });
+                                          await calcDiscount(0.00);
+                                        }
+                                      },
                                       // onFieldSubmitted: (value) {
-                                      //   convertToKG(
+                                      //   convertToRupee(
                                       //       discRupeeCtrl.text
                                       //           .toString()
                                       //           .trim(),
@@ -361,15 +380,14 @@ class _SaleCartX001State extends State<SaleCartX001> {
                                                     .toString()
                                                     .trim()
                                                     .isEmpty) {
-                                              await calcDiscount(0.0);                             
+                                              await calcDiscount(0.0);
                                               CustomSnackbar snackbar =
                                                   CustomSnackbar();
                                               snackbar.showSnackbar(
                                                   context,
                                                   "Must enter discount amount",
                                                   "");
-                                            } 
-                                            else if (discPerCtrl.text
+                                            } else if (discPerCtrl.text
                                                     .toString()
                                                     .trim()
                                                     .isNotEmpty &&
@@ -383,17 +401,16 @@ class _SaleCartX001State extends State<SaleCartX001> {
                                                   context,
                                                   "Dont enter % and amount together",
                                                   "");
-                                            } 
-                                            else if (discPerCtrl
+                                            } else if (discPerCtrl
                                                 .text.isNotEmpty) {
-                                              convertToKG(
+                                              convertToRupee(
                                                   discPerCtrl.text
                                                       .toString()
                                                       .trim(),
                                                   "per");
                                             } else if (discRupeeCtrl
                                                 .text.isNotEmpty) {
-                                              convertToKG(
+                                              convertToRupee(
                                                   discRupeeCtrl.text
                                                       .toString()
                                                       .trim(),
@@ -443,9 +460,9 @@ class _SaleCartX001State extends State<SaleCartX001> {
                                 onTap: (() async {
                                   // value.areDetails.clear();
                                   if (discPerCtrl.text.isNotEmpty &&
-                                          discInRupee == 0.0 ||
+                                          discInRupee == 0.00 ||
                                       discRupeeCtrl.text.isNotEmpty &&
-                                          discInRupee == 0.0) {
+                                          discInRupee == 0.00) {
                                     print("improper calc");
                                     CustomSnackbar snak = CustomSnackbar();
                                     snak.showSnackbar(
@@ -481,8 +498,8 @@ class _SaleCartX001State extends State<SaleCartX001> {
                                           value.orderTotal2[11],
                                           widget.branch_id,
                                           double.tryParse(discPerCtrl.text) ??
-                                              0.0,
-                                          discInRupee);
+                                              0.00,
+                                          discInRupee,value.totalAftrdiscount);
                                     }
                                     Provider.of<Controller>(context,
                                             listen: false)
@@ -527,8 +544,8 @@ class _SaleCartX001State extends State<SaleCartX001> {
   calcDiscount(double discamt) {
     double discval = double.parse(discamt.toString());
     double totval = Provider.of<Controller>(context, listen: false).salesTotal;
-    if (discamt == 0.0) {
-      discInRupee = 0.0;
+    if (discamt == 0.00) {
+      discInRupee = 0.00;
       Provider.of<Controller>(context, listen: false).totalAftrdiscount =
           totval;
     } else {
@@ -539,18 +556,26 @@ class _SaleCartX001State extends State<SaleCartX001> {
     setState(() {});
   }
 
-  convertToKG(String val, String wgttype) {
+  convertToRupee(String val, String wgttype) {
     double net =
         Provider.of<Controller>(context, listen: false).salesTotal ?? 0;
-    double per = double.tryParse(val.toString()) ?? 0;
-    if (wgttype == "rupee") {
-      discInRupee = per;
-    } else {
-      discInRupee = net * (per / 100);
+    double amt = double.tryParse(val) ?? 0;
+    if (wgttype == "rupee") 
+    {
+      discInRupee = amt;
+      double dper = discInRupee * (100 / net);
+      discInPercentage = dper.toStringAsFixed(3);  
+      discPerCtrl.text = discInPercentage;
+    } 
+    else 
+    {
+      discInRupee = net * (amt / 100);
+      discInRupee = double.parse(discInRupee.toStringAsFixed(3)); 
+      discRupeeCtrl.text = discInRupee.toString();
     }
     calcDiscount(discInRupee);
     // deductionCalulate(moistInkg, type);
-    print("% = $per \nNet = $net\n discInRupee  =$discInRupee");
+    print("% or amt= $amt \nNet = $net\n discInRupee  =$discInRupee");
     print("Disc in Rupee---${discInRupee.toString()}");
     setState(() {});
     // setState(() {});

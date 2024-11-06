@@ -28,6 +28,7 @@ class CommonPopup {
     String branch_id,
     double cashdisc_per,
     double cashdisc_amt,
+    double tot_aftr_disc,
     // double baserate,
   ) {
     Timer? _timer;
@@ -197,7 +198,7 @@ class CommonPopup {
                         "",
                         branch_id,
                         cashdisc_per,
-                        cashdisc_amt,
+                        cashdisc_amt,tot_aftr_disc,
                       );
                     }
 
@@ -245,11 +246,13 @@ class CommonPopup {
                                         Provider.of<Controller>(context,
                                                 listen: false)
                                             .printSales(
-                                                cid!,
-                                                context,
-                                                result[0],
-                                                areaname,
-                                                "not cancelled",outst[0]["outstanding"]);
+                                          cid!,
+                                          context,
+                                          result[0],
+                                          areaname,
+                                          "not cancelled",
+                                          outst[0]["outstanding"],
+                                        );
                                         // Navigator.pop(context);
                                         // Sunmi printer = Sunmi();
                                         // printer.printReceipt(

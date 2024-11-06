@@ -124,7 +124,8 @@ class _DownloadedPageState extends State<DownloadedPage> {
                 preferredSize: Size.fromHeight(6.0),
                 child: Consumer<Controller>(
                   builder: (context, value, child) {
-                    if (value.isLoading) {
+                    if (value.isLoading) 
+                    {
                       return LinearProgressIndicator(
                         backgroundColor: Colors.white,
                         color: P_Settings.wavecolor,
@@ -132,7 +133,9 @@ class _DownloadedPageState extends State<DownloadedPage> {
                         // valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
                         // value: 0.25,
                       );
-                    } else {
+                    } 
+                    else 
+                    {
                       return Container();
                     }
                   },
@@ -238,7 +241,6 @@ class _DownloadedPageState extends State<DownloadedPage> {
                                                 // .getMasterData("stock",
                                                 //     context, 0, "all");
                                               }
-
                                               if (downloadItems[index] ==
                                                   "Account Heads") 
                                               {

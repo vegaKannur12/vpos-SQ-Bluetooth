@@ -259,6 +259,7 @@ class OrderAppDB {
   static final cancel_dateTime = 'cancel_dateTime';
   static final cashdisc_per = 'cashdisc_per';
   static final cashdisc_amt = 'cashdisc_amt';
+  static final tot_aftr_disc = 'tot_aftr_disc';
   static final sflag = 'sflag';
 
   Future<Database> get database async {
@@ -491,6 +492,7 @@ class OrderAppDB {
             $cancel_dateTime TEXT,
             $cashdisc_per REAL,
             $cashdisc_amt REAL,
+            $tot_aftr_disc REAL,
             $brrid TEXT,
             $sflag INTEGER
           )
@@ -1116,6 +1118,7 @@ class OrderAppDB {
     String branch_id,
     double cashdisc_per,
     double cashdisc_amt,
+    double tot_aftr_disc,
   ) async {
     final db = await database;
     var res2;
@@ -1128,9 +1131,9 @@ class OrderAppDB {
       res2 = await db.rawInsert(query2);
     } else if (table == "salesMasterTable") {
       var query3 =
-          'INSERT INTO salesMasterTable(sales_id, salesdate, salestime, os, cus_type, bill_no, customer_id, staff_id, areaid, total_qty, payment_mode, credit_option, gross_tot, dis_tot, tax_tot, ces_tot, rounding, net_amt,  state_status, status , cancel ,cancel_staff,cancel_dateTime,cashdisc_per,cashdisc_amt ,brrid,sflag) VALUES("${sales_id}", "${salesdate}", "${salestime}", "${os}", "${cus_type}", "${bill_no}", "${customer_id}", "${staff_id}", "${areaid}", $total_qty, "${payment_mode}", "${credit_option}", $gross_tot, $dis_tot, $tax_tot, $ces_tot,${rounding}, ${total_price.toStringAsFixed(2)}, $state_status, ${status},${cancelStatus},"${cancel_staff}","${cancel_dateTime}",$cashdisc_per,$cashdisc_amt,"$branch_id",0)';
+          'INSERT INTO salesMasterTable(sales_id, salesdate, salestime, os, cus_type, bill_no, customer_id, staff_id, areaid, total_qty, payment_mode, credit_option, gross_tot, dis_tot, tax_tot, ces_tot, rounding, net_amt,  state_status, status , cancel ,cancel_staff,cancel_dateTime,cashdisc_per,cashdisc_amt,tot_aftr_disc,brrid,sflag) VALUES("${sales_id}", "${salesdate}", "${salestime}", "${os}", "${cus_type}", "${bill_no}", "${customer_id}", "${staff_id}", "${areaid}", $total_qty, "${payment_mode}", "${credit_option}", $gross_tot, $dis_tot, $tax_tot, $ces_tot,${rounding}, ${total_price.toStringAsFixed(2)}, $state_status, ${status},${cancelStatus},"${cancel_staff}","${cancel_dateTime}",$cashdisc_per,$cashdisc_amt,$tot_aftr_disc,"$branch_id",0)';
       res2 = await db.rawInsert(query3);
-      print("insertsalesmaster$query3");
+      print("insertsalesmaster $query3");
     }
   }
 
@@ -2583,20 +2586,18 @@ class OrderAppDB {
     var query;
     if (type == "upload history") {
       query =
-          'select accountHeadsTable.hname as cus_name,accountHeadsTable.ba as ba, accountHeadsTable.ac_ad1 as address, accountHeadsTable.ac_gst as gstin, salesMasterTable.sales_id sales_id,salesMasterTable.rounding roundoff, salesMasterTable.os  || salesMasterTable.sales_id as sale_Num,salesMasterTable.customer_id Cus_id,salesMasterTable.salesdate   Date, count(salesDetailTable.row_num) count,salesMasterTable.gross_tot grossTot,salesMasterTable.payment_mode payment_mode,salesMasterTable.credit_option creditoption, salesMasterTable.net_amt, salesMasterTable.tax_tot as taxtot, salesMasterTable.dis_tot as distot ,salesMasterTable.cancel as cancel  from salesMasterTable inner join salesDetailTable on salesMasterTable.sales_id=salesDetailTable.sales_id inner join accountHeadsTable on accountHeadsTable.ac_code= salesMasterTable.customer_id where salesMasterTable.salesdate="${date}" and salesMasterTable.status != 0  $condition group by salesMasterTable.sales_id';
+          'select accountHeadsTable.hname as cus_name,accountHeadsTable.ba as ba, accountHeadsTable.ac_ad1 as address, accountHeadsTable.ac_gst as gstin, salesMasterTable.sales_id sales_id,salesMasterTable.rounding roundoff, salesMasterTable.os  || salesMasterTable.sales_id as sale_Num,salesMasterTable.customer_id Cus_id,salesMasterTable.salesdate   Date, count(salesDetailTable.row_num) count,salesMasterTable.gross_tot grossTot,salesMasterTable.payment_mode payment_mode,salesMasterTable.credit_option creditoption, salesMasterTable.tot_aftr_disc, salesMasterTable.tax_tot as taxtot, salesMasterTable.dis_tot as distot ,salesMasterTable.cancel as cancel  from salesMasterTable inner join salesDetailTable on salesMasterTable.sales_id=salesDetailTable.sales_id inner join accountHeadsTable on accountHeadsTable.ac_code= salesMasterTable.customer_id where salesMasterTable.salesdate="${date}" and salesMasterTable.status != 0  $condition group by salesMasterTable.sales_id';
     } else if (type == "history pending") {
       query =
-          'select accountHeadsTable.hname as cus_name,accountHeadsTable.ba as ba, accountHeadsTable.ac_ad1 as address, accountHeadsTable.ac_gst as gstin, salesMasterTable.sales_id sales_id,salesMasterTable.rounding roundoff, salesMasterTable.os  || salesMasterTable.sales_id as sale_Num,salesMasterTable.customer_id Cus_id,salesMasterTable.salesdate   Date, count(salesDetailTable.row_num) count,salesMasterTable.gross_tot grossTot,salesMasterTable.payment_mode payment_mode,salesMasterTable.credit_option creditoption, salesMasterTable.net_amt, salesMasterTable.tax_tot as taxtot, salesMasterTable.dis_tot as distot ,salesMasterTable.cancel as cancel  from salesMasterTable inner join salesDetailTable on salesMasterTable.sales_id=salesDetailTable.sales_id inner join accountHeadsTable on accountHeadsTable.ac_code= salesMasterTable.customer_id where salesMasterTable.salesdate="${date}" and salesMasterTable.status == 0  $condition group by salesMasterTable.sales_id';
+          'select accountHeadsTable.hname as cus_name,accountHeadsTable.ba as ba, accountHeadsTable.ac_ad1 as address, accountHeadsTable.ac_gst as gstin, salesMasterTable.sales_id sales_id,salesMasterTable.rounding roundoff, salesMasterTable.os  || salesMasterTable.sales_id as sale_Num,salesMasterTable.customer_id Cus_id,salesMasterTable.salesdate   Date, count(salesDetailTable.row_num) count,salesMasterTable.gross_tot grossTot,salesMasterTable.payment_mode payment_mode,salesMasterTable.credit_option creditoption, salesMasterTable.tot_aftr_disc, salesMasterTable.tax_tot as taxtot, salesMasterTable.dis_tot as distot ,salesMasterTable.cancel as cancel  from salesMasterTable inner join salesDetailTable on salesMasterTable.sales_id=salesDetailTable.sales_id inner join accountHeadsTable on accountHeadsTable.ac_code= salesMasterTable.customer_id where salesMasterTable.salesdate="${date}" and salesMasterTable.status == 0  $condition group by salesMasterTable.sales_id';
     } else if (type == "sale report") {
       query =
-          'select accountHeadsTable.hname as cus_name,accountHeadsTable.ba as ba, accountHeadsTable.ac_ad1 as address, accountHeadsTable.ac_gst as gstin, salesMasterTable.sales_id sales_id,salesMasterTable.rounding roundoff, salesMasterTable.os  || salesMasterTable.sales_id as sale_Num,salesMasterTable.customer_id Cus_id,salesMasterTable.salesdate   Date, count(salesDetailTable.row_num) count,salesMasterTable.gross_tot grossTot,salesMasterTable.payment_mode payment_mode,salesMasterTable.credit_option creditoption, salesMasterTable.net_amt, salesMasterTable.tax_tot as taxtot, salesMasterTable.dis_tot as distot,salesMasterTable.cancel as cancel  from salesMasterTable inner join salesDetailTable on salesMasterTable.sales_id=salesDetailTable.sales_id inner join accountHeadsTable on accountHeadsTable.ac_code= salesMasterTable.customer_id where salesMasterTable.salesdate="${date}"  and salesMasterTable.cancel == 0 $condition group by salesMasterTable.sales_id';
+          'select accountHeadsTable.hname as cus_name,accountHeadsTable.ba as ba, accountHeadsTable.ac_ad1 as address, accountHeadsTable.ac_gst as gstin, salesMasterTable.sales_id sales_id,salesMasterTable.rounding roundoff, salesMasterTable.os  || salesMasterTable.sales_id as sale_Num,salesMasterTable.customer_id Cus_id,salesMasterTable.salesdate   Date, count(salesDetailTable.row_num) count,salesMasterTable.gross_tot grossTot,salesMasterTable.payment_mode payment_mode,salesMasterTable.credit_option creditoption, salesMasterTable.tot_aftr_disc, salesMasterTable.tax_tot as taxtot, salesMasterTable.dis_tot as distot,salesMasterTable.cancel as cancel  from salesMasterTable inner join salesDetailTable on salesMasterTable.sales_id=salesDetailTable.sales_id inner join accountHeadsTable on accountHeadsTable.ac_code= salesMasterTable.customer_id where salesMasterTable.salesdate="${date}"  and salesMasterTable.cancel == 0 $condition group by salesMasterTable.sales_id';
     } else {
       query =
-          'select accountHeadsTable.hname as cus_name,accountHeadsTable.ba as ba, accountHeadsTable.ac_ad1 as address, accountHeadsTable.ac_gst as gstin, salesMasterTable.sales_id sales_id,salesMasterTable.rounding roundoff, salesMasterTable.os  || salesMasterTable.sales_id as sale_Num,salesMasterTable.customer_id Cus_id,salesMasterTable.salesdate   Date, count(salesDetailTable.row_num) count,salesMasterTable.gross_tot grossTot,salesMasterTable.payment_mode payment_mode,salesMasterTable.credit_option creditoption, salesMasterTable.net_amt, salesMasterTable.tax_tot as taxtot, salesMasterTable.dis_tot as distot,salesMasterTable.cancel as cancel  from salesMasterTable inner join salesDetailTable on salesMasterTable.sales_id=salesDetailTable.sales_id inner join accountHeadsTable on accountHeadsTable.ac_code= salesMasterTable.customer_id where salesMasterTable.salesdate="${date}"  $condition group by salesMasterTable.sales_id';
+          'select accountHeadsTable.hname as cus_name,accountHeadsTable.ba as ba, accountHeadsTable.ac_ad1 as address, accountHeadsTable.ac_gst as gstin, salesMasterTable.sales_id sales_id,salesMasterTable.rounding roundoff, salesMasterTable.os  || salesMasterTable.sales_id as sale_Num,salesMasterTable.customer_id Cus_id,salesMasterTable.salesdate   Date, count(salesDetailTable.row_num) count,salesMasterTable.gross_tot grossTot,salesMasterTable.payment_mode payment_mode,salesMasterTable.credit_option creditoption, salesMasterTable.tot_aftr_disc, salesMasterTable.tax_tot as taxtot, salesMasterTable.dis_tot as distot,salesMasterTable.cancel as cancel  from salesMasterTable inner join salesDetailTable on salesMasterTable.sales_id=salesDetailTable.sales_id inner join accountHeadsTable on accountHeadsTable.ac_code= salesMasterTable.customer_id where salesMasterTable.salesdate="${date}"  $condition group by salesMasterTable.sales_id';
     }
-
     print("query---$query");
-
     result = await db.rawQuery(query);
     if (result.length > 0) {
       print("todddddddddddddddd----$result");
@@ -3087,24 +3088,23 @@ class OrderAppDB {
         " From returnMasterTable RT   where RT.return_date='$date' and RT.userid='$userId'" +
         " group by RT.customerid" +
         " union all" +
-        " Select S.customer_id cid , 0 ordCnt,0 ordVal,0 rmCnt,0 colCnt,0 colVal,Count(S.id) saleCnt,Sum(S.net_amt) saleVal,0 saleCntCS,0 saleValCS,0 saleCntCR,0 saleValCR, 0 retCnt,0 retVal,0 CanCnt, 0 CanAmt" +
+        " Select S.customer_id cid , 0 ordCnt,0 ordVal,0 rmCnt,0 colCnt,0 colVal,Count(S.id) saleCnt,Sum(S.tot_aftr_disc) saleVal,0 saleCntCS,0 saleValCS,0 saleCntCR,0 saleValCR, 0 retCnt,0 retVal,0 CanCnt, 0 CanAmt" +
         " From salesMasterTable S   where S.cancel= 0 and S.salesdate='$date' and S.staff_id='$userId'" +
         " group by S.customer_id" +
         " union all" +
-        " Select S.customer_id cid , 0 ordCnt,0 ordVal,0 rmCnt,0 colCnt,0 colVal,0 saleCnt,0 saleVal,0 saleCntCS,0 saleValCS,0 saleCntCR,0 saleValCR, 0 retCnt,0 retVal,Count(S.id) CanCnt, Sum(S.net_amt) CanAmt" +
+        " Select S.customer_id cid , 0 ordCnt,0 ordVal,0 rmCnt,0 colCnt,0 colVal,0 saleCnt,0 saleVal,0 saleCntCS,0 saleValCS,0 saleCntCR,0 saleValCR, 0 retCnt,0 retVal,Count(S.id) CanCnt, Sum(S.tot_aftr_disc) CanAmt" +
         " From salesMasterTable S   where S.cancel= 1 and S.salesdate='$date' and S.staff_id='$userId'" +
         " group by S.customer_id" +
         " union all" +
-        " Select S.customer_id cid , 0 ordCnt,0 ordVal,0 rmCnt,0 colCnt,0 colVal,0 saleCnt,0 saleVal,Count(S.id) saleCntCS,Sum(S.net_amt) saleValCS,0 saleCntCR,0 saleValCR,0 retCnt,0 retVal,0 CanCnt, 0 CanAmt" +
+        " Select S.customer_id cid , 0 ordCnt,0 ordVal,0 rmCnt,0 colCnt,0 colVal,0 saleCnt,0 saleVal,Count(S.id) saleCntCS,Sum(S.tot_aftr_disc) saleValCS,0 saleCntCR,0 saleValCR,0 retCnt,0 retVal,0 CanCnt, 0 CanAmt" +
         " From salesMasterTable S   where  S.cancel= 0 and S.salesdate='$date' and S.staff_id='$userId' and S.payment_mode = '-2' " +
         " group by S.customer_id" +
         " union all" +
-        " Select S.customer_id cid , 0 ordCnt,0 ordVal,0 rmCnt,0 colCnt,0 colVal,0 saleCnt,0 saleVal,0 saleCntCS,0 saleValCS,Count(S.id) saleCntCR,Sum(S.net_amt) saleValCR,0 retCnt,0 retVal,0 CanCnt, 0 CanAmt" +
+        " Select S.customer_id cid , 0 ordCnt,0 ordVal,0 rmCnt,0 colCnt,0 colVal,0 saleCnt,0 saleVal,0 saleCntCS,0 saleValCS,Count(S.id) saleCntCR,Sum(S.tot_aftr_disc) saleValCR,0 retCnt,0 retVal,0 CanCnt, 0 CanAmt" +
         " From salesMasterTable S   where  S.cancel= 0 and S.salesdate='$date' and S.staff_id='$userId' and S.payment_mode = '-3' " +
         " group by S.customer_id" +
         " ) X ON X.cid=A.ac_code" +
         " $condition;";
-
     result = await db.rawQuery(query);
     print("result--dashboard----$result");
     return result;

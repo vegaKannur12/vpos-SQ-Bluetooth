@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlorder24/components/commoncolor.dart';
+import 'package:sqlorder24/components/customSnackbar.dart';
 import 'package:sqlorder24/controller/controller.dart';
 import 'package:sqlorder24/db_helper.dart';
 import 'package:sqlorder24/screen/ORDER/1_companyRegistrationScreen.dart';
@@ -24,24 +25,26 @@ class _NextPageState extends State<NextPage> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.cyan,appBar: AppBar( 
+      backgroundColor: Colors.cyan,
+      appBar: AppBar(
         backgroundColor: Colors.cyan,
-         actions: [
-          
-            IconButton(
-              onPressed: () async {
-                List<Map<String, dynamic>> list =
-                    await OrderAppDB.instance.getListOfTables();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => TableList(list: list)),
-                );
-              },
-              icon: Icon(Icons.table_bar,color: Colors.black26,),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              List<Map<String, dynamic>> list =
+                  await OrderAppDB.instance.getListOfTables();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TableList(list: list)),
+              );
+            },
+            icon: Icon(
+              Icons.table_bar,
+              color: Colors.black26,
             ),
-            
-          ],),
+          ),
+        ],
+      ),
       body: InkWell(
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
@@ -62,6 +65,11 @@ class _NextPageState extends State<NextPage> {
                       onLongPress: () async {
                         Map<String, dynamic>? temp =
                             await externalDir.fileRead();
+                        String? db = "";
+                        String? ip = "";
+                        String? port = "";
+                        String? un = "";
+                        String? pw = "";
                         TextEditingController dbc = TextEditingController();
                         TextEditingController ipc = TextEditingController();
                         TextEditingController usrc = TextEditingController();
@@ -69,11 +77,21 @@ class _NextPageState extends State<NextPage> {
                         TextEditingController pwdc = TextEditingController();
                         bool pressed = false;
                         // SharedPreferences prefs = await SharedPreferences.getInstance();
-                        String? db = temp!["DB"];
-                        String? ip = temp!["IP"];
-                        String? port = temp!["PORT"];
-                        String? un = temp!["USR"];
-                        String? pw = temp!["PWD"];
+                        if (temp != null && temp.isNotEmpty && temp != {}) {
+                          print("from file from storage");
+                          db = temp!["DB"];
+                          ip = temp!["IP"];
+                          port = temp!["PORT"];
+                          un = temp!["USR"];
+                          pw = temp!["PWD"];
+                        } else {
+                          print("from hardcode");
+                          db = "APP_REGISTER";
+                          ip = "103.177.225.245";
+                          port = "54321";
+                          un = "sa";
+                          pw = "##v0e3g9a#";
+                        }
                         await showDialog(
                             context: context,
                             builder: (context) {
@@ -232,7 +250,8 @@ class _NextPageState extends State<NextPage> {
                       padding:
                           const EdgeInsets.only(top: 40, left: 17.0, right: 17),
                       child: SizedBox(
-                        height: size.height * 0.06,width: size.width*1/2,
+                        height: size.height * 0.06,
+                        width: size.width * 1 / 2,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -242,9 +261,16 @@ class _NextPageState extends State<NextPage> {
                             ),
                           ),
                           onPressed: () async {
-                            await Provider.of<Controller>(context,
+                            int con = await Provider.of<Controller>(context,
                                     listen: false)
                                 .initPrimaryDb(context);
+                            if (con == 1) {
+                            } else {
+                              CustomSnackbar snackbar = CustomSnackbar();
+                              snackbar.showSnackbar(
+                                  context, "Error Connecting Database", "");
+                              print("NOT connected 1st");
+                            }
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -411,7 +411,8 @@ class OrderBottomSheet {
                                               ['prid'];
                                           if (value.qty[index].text != null &&
                                               value
-                                                  .qty[index].text.isNotEmpty) {
+                                                  .qty[index].text.isNotEmpty) 
+                                          {
                                             double total = double.parse(value
                                                     .orderrate_X001[index]
                                                     .text) *
@@ -460,7 +461,9 @@ class OrderBottomSheet {
                                               os,
                                               customerId,
                                             );
-                                          } else {
+                                          } 
+                                          else 
+                                          {
                                             // await OrderAppDB.instance
                                             //     .upadteCommonQuery(
                                             //         "orderBagTable",

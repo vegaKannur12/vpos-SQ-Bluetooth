@@ -512,12 +512,14 @@ class Controller extends ChangeNotifier {
         context,
         MaterialPageRoute(builder: (context) => RegistrationScreen()),
       );
+      return 1;
       // Navigator.pop(context);
       // getDatabasename(context, type);
     } catch (e) {
       debugPrint(e.toString());
       debugPrint("not connected..PrimaryDB..");
-      Navigator.pop(context);
+      // Navigator.pop(context);
+      return 0;
       // await showINITConnectionDialog(context, "INDB", e.toString());
     } finally {
       // Navigator.pop(context);
@@ -2412,6 +2414,7 @@ class Controller extends ChangeNotifier {
     String branch_id,
     double cashdisc_per,
     double cashdisc_amt,
+    double tot_aftr_disc,
     // double baserate,
   ) async {
     List<Map<String, dynamic>> om = [];
@@ -2419,6 +2422,7 @@ class Controller extends ChangeNotifier {
     print("to sale bag-brnvhid-$branch_id");
     print("to sale bag discper-$cashdisc_per");
     print("to sale bag discAmount-$cashdisc_amt");
+    print("$tot_aftr_disc");
     // String salesOs = "S" + "$os";
     // int sales_id = await OrderAppDB.instance
     //     .getMaxCommonQuery('salesDetailTable', 'sales_id', "os='${os}'");
@@ -2482,65 +2486,66 @@ class Controller extends ChangeNotifier {
           cancel_time,
           branch_id.toString(),
           cashdisc_per,
-          cashdisc_amt,);
+          cashdisc_amt,
+          tot_aftr_disc);
 
       for (var item in salebagList) {
         print("item....$item");
         double gross = item["unit_rate"] * item["qty"];
         await OrderAppDB.instance.insertsalesMasterandDetailsTable(
-          sales_id,
-          item["qty"],
-          item["rate"],
-          item["unit_rate"],
-          item["code"],
-          item["hsn"],
-          date,
-          time,
-          os,
-          customer_id,
-          "",
-          billNo,
-          staff_id,
-          aid,
-          0,
-          "",
-          "",
-          item["unit_name"],
-          rowNum,
-          "salesDetailTable",
-          item["itemName"],
-          gross,
-          item["discount_amt"],
-          item["discount_per"],
-          item["tax_amt"],
-          item["tax_per"],
-          item["cgst_per"],
-          item["cgst_amt"],
-          item["sgst_per"],
-          item["sgst_amt"],
-          item["igst_per"],
-          item["igst_amt"],
-          item["ces_amt"],
-          item["ces_per"],
-          0.0,
-          0.0,
-          0.0,
-          item["net_amt"],
-          0.0,
-          item["net_amt"],
-          roundoff,
-          0,
-          0,
-          0.0,
-          item["baserate"],
-          item["package"],
-          0,
-          cancel_staff,
-          cancel_time,
-          branch_id.toString(),
-          cashdisc_per,
-          cashdisc_amt,
-        );
+            sales_id,
+            item["qty"],
+            item["rate"],
+            item["unit_rate"],
+            item["code"],
+            item["hsn"],
+            date,
+            time,
+            os,
+            customer_id,
+            "",
+            billNo,
+            staff_id,
+            aid,
+            0,
+            "",
+            "",
+            item["unit_name"],
+            rowNum,
+            "salesDetailTable",
+            item["itemName"],
+            gross,
+            item["discount_amt"],
+            item["discount_per"],
+            item["tax_amt"],
+            item["tax_per"],
+            item["cgst_per"],
+            item["cgst_amt"],
+            item["sgst_per"],
+            item["sgst_amt"],
+            item["igst_per"],
+            item["igst_amt"],
+            item["ces_amt"],
+            item["ces_per"],
+            0.0,
+            0.0,
+            0.0,
+            item["net_amt"],
+            0.0,
+            item["net_amt"],
+            roundoff,
+            0,
+            0,
+            0.0,
+            item["baserate"],
+            item["package"],
+            0,
+            cancel_staff,
+            cancel_time,
+            branch_id.toString(),
+            cashdisc_per,
+            cashdisc_amt,
+            tot_aftr_disc);
         rowNum = rowNum + 1;
       }
 
@@ -2556,6 +2561,7 @@ class Controller extends ChangeNotifier {
       String? cmid = prefs.getString("cid");
       await uploadSalesDatasql(cmid.toString(), context, 0, "");
     }
+
     print("set----$settingsList1");
     // if (settingsList1[2]["set_value"] == "YES") {
     // uploadSalesData(cid!, context, 0, "comomn popup");     /// 25sep
@@ -3015,6 +3021,7 @@ class Controller extends ChangeNotifier {
         print("custmerDetails adding $custmerDetails");
         notifyListeners();
       } else {
+        //  snackbar.showSnackbar(context, "Please download Customers", "");
         print("custmerDetails after clear----${custmerDetails}");
         custmerDetails.clear();
         if (aid == null) {
@@ -3943,7 +3950,7 @@ class Controller extends ChangeNotifier {
           "grossTot": item["grossTot"],
           "payment_mode": item["payment_mode"],
           "creditoption": item["creditoption"],
-          "net_amt": item["net_amt"],
+          "net_amt": item["tot_aftr_disc"],
           "taxtot": item["taxtot"],
           "distot": item["distot"],
           "cancel": item["cancel"]
@@ -4065,7 +4072,7 @@ class Controller extends ChangeNotifier {
 
     var res = await OrderAppDB.instance.dashboardSummery(sid, date, aid);
     var result = await OrderAppDB.instance.countCustomer(areaidFrompopup);
-    print("resultresult-- $res");
+    print("resultresult dashboardSummery-- $res");
     if (result.length > 0) {
       customerCount = result.length;
       notifyListeners();
@@ -4147,7 +4154,7 @@ class Controller extends ChangeNotifier {
     shopVisited = res[0]["cusCount"];
 
     if (customerCount == null || customerCount == "null") {
-      snackbar.showSnackbar(context, "Please download Customers", "");
+      // snackbar.showSnackbar(context, "Please download Customers", "");
     } else {
       noshopVisited = customerCount! - shopVisited!;
     }
@@ -4635,7 +4642,7 @@ class Controller extends ChangeNotifier {
 
   // }
   uploadSalesDatasql(
-      String cid, BuildContext context, int? index, String page) async {
+      String cid, BuildContext context, int index, String page) async {
     int con = await initSecondaryDb(context);
     if (con == 1) {
       int f = 0;
@@ -4651,8 +4658,10 @@ class Controller extends ChangeNotifier {
       String jsonE = jsonEncode(result);
       var jsonMstr = jsonDecode(jsonE);
       if (result.isNotEmpty) {
-        isUpload = true;
+        isUpload = false;
         isLoading = true;
+        isUp[index] = true;
+        notifyListeners();
         for (var item in jsonMstr) {
           var result = await OrderAppDB.instance
               .selectSalesMasterTableByID(item["s_id"]);
@@ -4719,9 +4728,11 @@ class Controller extends ChangeNotifier {
                     "salesMasterTable", "status = 1", "sales_id='${itemsid}'");
 
                 await generateSalesInvoice(context);
+                // CustomSnackbar snk=CustomSnackbar();
+
                 isUpload = false;
                 if (page == "upload page") {
-                  isUp[index!] = true;
+                  isUp[index] = true;
                 }
                 isLoading = false;
                 notifyListeners();
@@ -4763,6 +4774,7 @@ class Controller extends ChangeNotifier {
           if (result.length > 0) {
             Uri url = Uri.parse("https://trafiqerp.in/order/fj/cus_save.php");
             isUpload = true;
+            isUp[index!] = true;
             isLoading = true;
             notifyListeners();
             var customer = await OrderAppDB.instance.uploadCustomer();
@@ -5004,8 +5016,10 @@ class Controller extends ChangeNotifier {
       var jsonMstr = jsonDecode(jsonE);
       print("collection result......$result");
       if (result.isNotEmpty) {
-        isUpload = true;
+        isUpload = false;
         isLoading = true;
+        isUp[index!] = true;
+        notifyListeners();
         if (page == "upload page") {
           isUp[index!] = true;
         }
@@ -5872,7 +5886,8 @@ class Controller extends ChangeNotifier {
       BuildContext context,
       Map<String, dynamic> salesMasterData,
       String? areaName,
-      String isCancelled,double balncfromsave) async {
+      String isCancelled,
+      double balncfromsave) async {
     List<Map<String, dynamic>> taxableData = [];
     List<Map<String, dynamic>> resultQuery = [];
 

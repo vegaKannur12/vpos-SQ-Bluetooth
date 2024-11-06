@@ -48,7 +48,7 @@ import 'screen/ADMIN_/adminController.dart';
 //   }
 // }
 
-void requestPermission() async {
+ requestPermission() async {
   var sta = await Permission.storage.request();
   var status = Platform.isIOS
       ? await Permission.photos.request()
@@ -124,7 +124,7 @@ Future<void> main() async {
   String? cid = prefs.getString("company_id");
   var status = await Permission.storage.status;
 //  permission();
-  requestPermission();
+  await requestPermission();
 
   // checkPerm();
   runApp(MultiProvider(

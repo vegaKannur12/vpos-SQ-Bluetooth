@@ -505,7 +505,6 @@ class _MainDashboardState extends State<MainDashboard> {
                                       "/" +
                                       "\u{20B9}${value.salesAmount == "null" ? "0.0" : value.salesAmount}"),
                             ),
-
                             // Padding(
                             //   padding: const EdgeInsets.all(0),
                             //   child: customcard(
